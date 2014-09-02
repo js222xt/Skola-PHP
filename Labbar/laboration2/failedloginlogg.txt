@@ -1,0 +1,24 @@
+[Username]
+Admin
+[Password]
+Passwrod
+[Time]
+Torsdag, den  Oktober år 2013. Klockan är [03:10:04].
+----------------------------------------------------
+
+[Username]
+Admin
+[Password]
+notcorrect
+[Time]
+Måndag, den  September år 2014. Klockan är [17:16:02].
+----------------------------------------------------
+
+[Username]
+Admina
+[Password]
+Password
+[Time]
+Måndag, den  September år 2014. Klockan är [17:16:44].
+----------------------------------------------------
+
