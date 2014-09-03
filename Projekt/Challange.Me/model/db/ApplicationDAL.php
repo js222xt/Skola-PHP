@@ -509,7 +509,7 @@ class ApplicationDAL{
 		// Prepare IN and OUT parameters
 		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		
-		if (!$result = $this->mysqli->query("CALL RemoveChallengeFromDB(@AID)")) {
+		if (!$result = $this->mysqli->query("CALL RemoveChallengeFromDB(@CID)")) {
 			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
 		}		 
 		
@@ -675,9 +675,9 @@ class ApplicationDAL{
 		$this->ConnectToDB();
 		
 		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @ID = " . "'" . $this->mysqli->real_escape_string($ID) . "'");
+		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($ID) . "'");
 		
-		if (!$result = $this->mysqli->query("CALL MarkChallengedAsRead(@ID)")) {
+		if (!$result = $this->mysqli->query("CALL MarkChallengedAsRead(@AID)")) {
 			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
 		}		 
 		

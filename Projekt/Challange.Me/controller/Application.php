@@ -66,8 +66,6 @@ class Application{
 	public function startApplication(){
 		try{
 			
-			// TEST GIT STUFF
-			
 			// INIT CLASSES
 			
 			// Application DAL
@@ -237,7 +235,6 @@ class Application{
 						
 					}
 					if($this->applicationView->UserWantsToSeeNewChallenges()){
-						
 						// Get all the challenges that user has ben challenged with
 						$challenged = $this->applicationDAL->GetAllChallengesUserChallnegedWith($this->loggedInUser[0]['ID']);
 						
@@ -289,9 +286,11 @@ class Application{
 			// FOOTER
 			$this->footer = $this->footerView->GetFooterHTML();
 			
+			if($this->loginController->isUserLoggedIn()){
+				// See if user has any unread notification
+				$this->CheckNotifications();	
+			}
 			
-			// See if user has any unread notification
-			$this->CheckNotifications();
 			
 			// Return HTML
 			$pageView = new \view\HTMLPage();
