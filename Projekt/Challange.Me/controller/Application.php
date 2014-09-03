@@ -66,6 +66,8 @@ class Application{
 	public function startApplication(){
 		try{
 			
+			// TEST GIT STUFF
+			
 			// INIT CLASSES
 			
 			// Application DAL
