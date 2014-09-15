@@ -75,24 +75,28 @@ class ChallengeController{
 	/**
 	 * @return String HTML
 	 */
-	public function ShowChallengeHTML(){
+	public function ShowChallengeHTML($loggedInUser, $friends){
 		$html ="";
 		// Update challenge list from Database
 		$challenges = $this->applicationDAL->GetAllChallenges();
-		
+
 		// If we find the challenge
 		$foundChallenge = false;
 		
 		// Get the one we want
-		for ($i=0; $i < count($challenges); $i++) { 
-			if($ID == $challenges[$i][0]){
+		$ID = $this->applicationView->GetSeeChallengeIDFromGet(); 
+
+		for ($i=0; $i < count($challenges); $i++) {
+			
+			if($ID == $challenges[$i]['ID']){
+
 				$foundChallenge = true;
 				
 				// Show challenge!
-				$html .= $this->applicationView->ShowDetailedChallenge($challenges[$i], $this->loggedInUser[0]['ID'], $this->loggedInUser[0]['IsAdmin']);							
+				$html .= $this->applicationView->ShowDetailedChallenge($challenges[$i], $loggedInUser[0]['ID'], $loggedInUser[0]['IsAdmin'], $friends);							
 
 				// Get all comments
-				$comments = $this->applicationDAL->GetComments($challenges[$i][0]);
+				$comments = $this->applicationDAL->GetComments($challenges[$i]['ID']);
 				
 				// Show comment system
 				$html .= $this->applicationView->ShowCommentSystemStart();
@@ -105,11 +109,11 @@ class ChallengeController{
 					if(count($user) == 1){
 						// Is it our user?
 						$ourUser = false;
-						if($this->loggedInUser[0]['ID'] == $user[0]['ID']){
+						if($loggedInUser[0]['ID'] == $user[0]['ID']){
 							$ourUser = true;
 						}
 					
-						$html.= $this->applicationView->ShowComment($comments[$i], $user, $ourUser);
+						$html .= $this->applicationView->ShowComment($comments[$i], $user, $ourUser);
 					}
 					else {
 						$this->applicationView->NoUserFound();

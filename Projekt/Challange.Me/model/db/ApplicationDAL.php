@@ -2,15 +2,17 @@
 
 namespace model\db;
 
+require_once("DBException.php");
+
 class ApplicationDAL{
 	
 	/**@var MySQLi */
 	private $mysqli;
-
 	
+		
 	private function ConnectToDB(){
 		$this->mysqli = new \mysqli("localhost", "admin", "password");
-		mysqli_select_db($this->mysqli, "challengeme");
+		mysqli_select_db($this->mysqli, "challengeme");		
 	}
 	
 	/*
@@ -22,7 +24,7 @@ class ApplicationDAL{
 		$retArray = array();
 		
 		if (!$result = $this->mysqli->query("CALL GetAllChallenges")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -48,7 +50,7 @@ class ApplicationDAL{
 		$retArray = array();
 		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		if (!$result = $this->mysqli->query("CALL GetChallenge(@CID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -79,7 +81,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetAllChallangesForID(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -111,7 +113,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetAllCompletedChallangesForID(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -136,7 +138,7 @@ class ApplicationDAL{
 	 */
 	public function TakeChallenge($ID, $challengeID){
 		if (!$this->dbConnection->multi_query("CALL AddChallenge($ID,$challengeID)")) {
-			echo "CALL failed: (" . $this->dbConnection->errno . ") " . $this->dbConnection->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 	}
 	
@@ -152,7 +154,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @pass = " . "'" . $this->mysqli->real_escape_string($pass) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL LoginUser(@user,@pass)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -176,26 +178,31 @@ class ApplicationDAL{
 	 * @return Array containing all comments for a challenge
 	 */
 	public function GetComments($challengeID){
-		if (!$this->dbConnection->multi_query("CALL GetAllComments($challengeID)")) {
-			echo "CALL failed: (" . $this->dbConnection->errno . ") " . $this->dbConnection->error;
+		
+		$this->ConnectToDB();
+		
+		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($challengeID) . "'");
+		
+		$retArray = array();
+		
+		if (!$result = $this->mysqli->query("CALL GetAllComments(@CID)")) {
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
-		else {
-			$retArray;
-			do {
-			    if ($res = $this->dbConnection->store_result()) {
-			    	// Get all results
-					$retArray = $res->fetch_all();
-
-			        $res->free();
-			    } else {
-			        if ($this->dbConnection->errno) {
-			            echo "Store failed: (" . $this->dbConnection->errno . ") " . $this->dbConnection->error;
-			        }
+		else{
+			if($result->num_rows > 0) 
+			{
+			    while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
+			    {
+			    	array_push($retArray, $row);
 			    }
-			} while ($this->dbConnection->more_results() && $this->dbConnection->next_result());
-			
-			return $retArray;
+			}			
 		}
+		
+		// Free
+		mysqli_free_result($result);
+		mysqli_close($this->mysqli);
+		// Return
+		return $retArray;
 	}
 	
 	/**
@@ -209,7 +216,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetAllFriendsForUser(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -241,7 +248,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetComment(@CID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -272,7 +279,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetUser(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -299,7 +306,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL BanUser(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		
 		// Free
@@ -307,13 +314,13 @@ class ApplicationDAL{
 	}
 	
 	public function UnBanUser($AID){
-		$this->ConnectToDB();
+		//$this->ConnectToDB();
 
 		// Prepare IN and OUT parameters
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL UnbanUser(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		
 		// Free
@@ -329,7 +336,7 @@ class ApplicationDAL{
 		$retArray = array();
 		
 		if (!$result = $this->mysqli->query("CALL GetAllUsers()")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -354,7 +361,7 @@ class ApplicationDAL{
 	 */
 	public function GetCommentsOnComment($CID){
 		if (!$this->dbConnection->multi_query("CALL GetCommentOnComment($CID)")) {
-			echo "CALL failed: (" . $this->dbConnection->errno . ") " . $this->dbConnection->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else {
 			$retArray;
@@ -388,7 +395,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @comment = " . "'" . $this->mysqli->real_escape_string($comment) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL AddCommentToComment(@CID,@AID,@title, @comment )")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -409,7 +416,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @comment = " . "'" . $this->mysqli->real_escape_string($comment) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL AddCommentToChallenge(@AID,@CID,@title, @comment )")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -429,7 +436,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @PID2 = " . "'" . $this->mysqli->real_escape_string($PID2) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL AddFriend(@PID1,@PID2)")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -450,7 +457,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @Worth = " . "'" . $this->mysqli->real_escape_string($worth) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL AddChallengeToDB(@Name,@Desc, @Worth)")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -472,7 +479,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @PID2 = " . "'" . $this->mysqli->real_escape_string($PID2) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL RemoveFriend(@PID1,@PID2)")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -492,7 +499,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL RemoveChallengeFromUser(@AID,@CID )")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -510,7 +517,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL RemoveChallengeFromDB(@CID)")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -530,7 +537,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL RemoveComment(@CID )")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -550,7 +557,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL FinishChallengeForUser(@AID,@CID )")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -578,7 +585,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @CHP = " . "'" . $this->mysqli->real_escape_string($challengePoints) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL RegisterAccount(@Username, @Password, @Email, @FName, @LName, @CHP)")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -596,7 +603,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @Username = " . "'" . $this->mysqli->real_escape_string($username) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetUserFromUsername(@Username)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -627,7 +634,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @Email = " . "'" . $this->mysqli->real_escape_string($email) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetEmailFromEmail(@Email)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -661,7 +668,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL ChallengeUser(@UserID, @FriendID, @CID)")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -678,7 +685,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($ID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL MarkChallengedAsRead(@AID)")) {
-			die("CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error);
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}		 
 		
 		// Free
@@ -695,7 +702,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetUnreadChallengesNotifications(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			
@@ -723,7 +730,7 @@ class ApplicationDAL{
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
 		
 		if (!$result = $this->mysqli->query("CALL GetAllChallengesUserChallnegedWith(@AID)")) {
-			echo "CALL failed: (" . $this->mysqli->errno . ") " . $this->mysqli->error;
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
 			

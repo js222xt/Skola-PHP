@@ -56,8 +56,6 @@ class Application{
 	private $applicationDAL;
 	/** @var Array containing user information */
 	private $loggedInUser;
-	/** @var Int with challenge point default value */
-	private $challengePointsDefault = 0;
 	
 	/**
 	 * start the aplication
@@ -132,7 +130,7 @@ class Application{
 						}											
 						
 						// Show the challenge
-						$this->challengeController->ShowChallenge();
+						$this->body .= $this->challengeController->ShowChallengeHTML($this->loggedInUser, $this->userController->GetAllFriends($this->loggedInUser));
 						
 					}
 					// If MyStuff
@@ -259,7 +257,7 @@ class Application{
 				if($this->applicationView->UserWantsToRegisterNewAccount()){
 					
 					// Get HTML
-					$this->body .= $this->userController->RegisterNewAccountHTML();
+					$this->body .= $this->loginController->RegisterNewAccountHTML();
 				}
 			}
 
@@ -300,11 +298,18 @@ class Application{
 		}
 		// Database exception is thrown!
 		catch(\model\db\DBConnectionException $dbex){
-			//@TODO: Return error page
+
+			$this->applicationView->DataBaseError();
+			$htmlError = $this->applicationView->GetErrorsHTML();
+
+			return $htmlError;
 		}
 		// Comething else is wrong!
 		catch (Exception $ex){
-			//@TODO: Return error page
+			$this->applicationView->UnexpectedError();
+			$htmlError = $this->applicationView->GetErrorsHTML();
+			
+			return $htmlError;			
 		}	
 	}
 	
@@ -363,15 +368,7 @@ class Application{
 		$this->title = $this->applicationView->getNotLoggedInTitle();
 	}	
 	
-	/**
-	 * @var String
-	 * @return bool if match
-	 */
-	private function SQLInjectionCheck($subject){
-		$pattern = "/^('(''|[^'])*')|(;)|(%)|(\b(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})\b)$/";
-						
-		return !preg_match($pattern, $subject);
-	}
+	
 	
 	
 }

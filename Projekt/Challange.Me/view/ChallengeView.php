@@ -46,7 +46,8 @@ class ChallengeView{
 		}
 					
 		// Challenge Friend
-		if(count($friends[0]) > 0){
+
+		if(count($friends) > 0){
 			$html .= "<br><br><form method='post' action='index.php?" . $this->challengeFriendString . "=" . $challenge['ID'] . "'";
 			for ($i=0; $i < count($friends[0]); $i++) {
 				$html .= "

@@ -17,6 +17,9 @@ class LoginController{
 	private $isLoggedInWithCookies = false;
 	/** @var Bool */
 	private $isLoggedInWithSession = false;
+	/** @var Int with challenge point default value */
+	private $challengePointsDefault = 0;
+	/** @var Boolean if user already is logge in, used with register */
 	
 	public function __construct($appDAL, $appView){
 		$this->loginModel = new \model\LoginModel();
@@ -30,13 +33,12 @@ class LoginController{
 	 * @return Bool
 	 */
 	public function SuccessfullLogin($username,$password){
-
-		//@TODO: Add hash		
+			
 		// Hash password
 		$hPass = $this->loginModel->GetEncryptedString($password);
 		
 		// Check Database		
-		$user =  $this->applicationDAL->LoginUser($username, $password);
+		$user =  $this->applicationDAL->LoginUser($username, $hPass);
 
 		// Can only be one user
 		if(count($user) == 1){
@@ -119,10 +121,6 @@ class LoginController{
 			$this->applicationView->setInputErrors();
 		}
 		return $isLoggedInWithPost;
-	}
-	
-	public function TryLoginAfterRegister($username, $password){
-		$isLoggedIn = $this->successfullLogin($username,$password);
 	}
 	
 	/**
@@ -252,36 +250,45 @@ class LoginController{
 				$fName = $info[3];
 				$lName = $info[4];
 				
-				if(!$this->SQLInjectionCheck($username+$password+$email+$fName+$lName)){							
+				if($this->SQLInjectionCheck($username+$password+$email+$fName+$lName)){							
 				
 					// Check if username of email exists
 					$userFromDB = $this->applicationDAL->GetUserFromUsername($username);
 					$emailFromDB = $this->applicationDAL->GetEmailFromEmail($email);
 					
+					$errorsFound = false;
+					
 					if(count( $userFromDB ) == 0){
 						if(count( $emailFromDB ) == 0){
 							if(strlen($username) > 50 || strlen($username) == 0){
-							$this->applicationView->UsernameIsInvalid();
+								$this->applicationView->UsernameIsInvalid();
+								$errorsFound = true;
 							}
 							if(strlen($password) > 50 || strlen($password) == 0){
 								$this->applicationView->PasswordIsInvalid();
+								$errorsFound = true;
 							}
 							if(strlen($email) > 200 || strlen($email) == 0){
 								$this->applicationView->EmailIsInvalid();
+								$errorsFound = true;
 							}
 							if(strlen($fName) > 50 || strlen($fName) == 0){
 								$this->applicationView->FNameIsInvalid();
+								$errorsFound = true;
 							}
 							if(strlen($lName) > 50 || strlen($lName) == 0){
 								$this->applicationView->LNameIsInvalid();
+								$errorsFound = true;
 							}
 						}
 						else {
 							$this->applicationView->EmailAlreadyExists();
+							$errorsFound = true;
 						}
 					}
 					else {
 						$this->applicationView->UsernameAlreadyExists();
+						$errorsFound = true;
 					}
 					
 					// No errors found
@@ -295,8 +302,6 @@ class LoginController{
 															   $lName, $this->challengePointsDefault );
 						
 						$this->applicationView->AddUserCanNowLogin($username);
-						
-						$this->TryLoginAfterRegister($username, $password);
 					}
 					else {
 						$html .= $this->applicationView->GetRegisterNewAccountHTML();
@@ -315,5 +320,15 @@ class LoginController{
 		}
 		
 		return $html;
+	}
+
+	/**
+	 * @var String
+	 * @return bool if match
+	 */
+	private function SQLInjectionCheck($subject){
+		$pattern = "/^('(''|[^'])*')|(;)|(%)|(\b(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})\b)$/";
+						
+		return !preg_match($pattern, $subject);
 	}
 }

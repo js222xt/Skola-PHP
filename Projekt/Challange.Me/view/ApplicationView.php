@@ -670,8 +670,8 @@ class ApplicationView{
 	 * @var Array
 	 * Return HTML for the challenge given
 	 */
-	public function ShowDetailedChallenge($challenge, $hasChallenge, $isAdmnin){	
-		return self::$challengeView->DisplayChallenge($challenge, $hasChallenge, $isAdmnin);
+	public function ShowDetailedChallenge($challenge, $hasChallenge, $isAdmnin, $friends){	
+		return self::$challengeView->DisplayChallenge($challenge, $hasChallenge, $isAdmnin, $friends);
 	}
 	
 	/**
@@ -1485,6 +1485,19 @@ class ApplicationView{
 		}
 	}
 	
+	/**
+	 * Adds an error
+	 */
+	public function DataBaseError(){
+		array_push($this->errors, "A database error has occured, please try again later or press <a href='index.php'>here to go to main</a>.");
+	}	
+	
+	/**
+	 * Adds an error
+	 */
+	public function UnexpectedError(){
+		array_push($this->errors, "An unexpected error has occured, please try again later or press <a href='index.php'>here to go to main</a>.");
+	}
 	
 	/**
 	 * Adds success message
@@ -1568,8 +1581,7 @@ class ApplicationView{
 	 * Adds an error
 	 */
 	public function AddUserCanNowLogin($name){
-		array_push($this->succeded, "Well, well, well, look who we got here, you think you got what it takes \"" . $name . "\" to be a real challenger? Get started <a href='index.php?"
-			 . self::$headerView->GetChallengeString() . "'>here</a>!");
+		array_push($this->succeded, "Well, well, well, look who we got here, you think you got what it takes \"" . $name . "\" to be a real challenger? Login <a href='index.php?'>here</a>!");
 	}
 	
 	/**
