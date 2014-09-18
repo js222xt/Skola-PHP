@@ -396,7 +396,7 @@ class ApplicationView{
 				<p>Email: <label class='accInfoLabel'>" . $user[0]['Email'] . "</label> </p>
 				<p>First name: <label class='accInfoLabel'>" . $user[0]['FName'] . "</label> </p>
 				<p>Last name: <label class='accInfoLabel'>" . $user[0]['LName'] . "</label> </p>
-				<p>Challenge points: <label class='accInfoLabel'>" . $user[0]['ChallengePoints'] . "</label> </p>
+				<p>Challenge points: <label class='accInfoLabel'>" . $user[0]['challengePoints'] . "</label> </p>
 			</div>	
 		";
 		
@@ -557,7 +557,7 @@ class ApplicationView{
 							<p>Email: <label class='accInfoLabel'>" . $user['Email'] . "</label> </p>
 							<p>First name: <label class='accInfoLabel'>" . $user['FName'] . "</label> </p>
 							<p>Last name: <label class='accInfoLabel'>" . $user['LName'] . "</label> </p>
-							<p>Challenge points: <label class='accInfoLabel'>" . $user['ChallengePoints'] . "</label> </p>
+							<p>Challenge points: <label class='accInfoLabel'>" . $user['challengePoints'] . "</label> </p>
 							<p>Banned? <label class='accInfoLabel'";
 							
 							if((boolean)$isBanned){

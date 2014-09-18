@@ -104,7 +104,8 @@ class ChallengeController{
 				for ($i=0; $i < count($comments); $i++) { 
 												
 					// Get user who wrote base comment
-					$user = $this->applicationDAL->GetUser($comments[$i][1]);
+
+					$user = $this->applicationDAL->GetUser($comments[$i]['AID']);
 				
 					if(count($user) == 1){
 						// Is it our user?

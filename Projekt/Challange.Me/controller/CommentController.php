@@ -21,6 +21,7 @@ class CommentController{
 		
 		// Check if valid
 		if($ID != -1 && is_numeric($ID)){
+			$errorsFound = false;
 			// Check if stuff got posted
 			if($this->applicationView->UserHavePostedCommentCorrectly()){
 				// Validate
@@ -33,10 +34,12 @@ class CommentController{
 				if( strlen($title) == 0 ||
 					strlen($title) > 50){
 					$this->applicationView->TitleIsInvalid();
+					$errorsFound = true;
 				}
 				else if(strlen($comment) == 0 ||
 						strlen($comment) > 250){
-					$this->applicationView->CommentIsInvalid();			
+					$this->applicationView->CommentIsInvalid();	
+					$errorsFound = true;
 				}
 						
 				// Errors?
@@ -53,14 +56,14 @@ class CommentController{
 	}	
 	
 	public function RemoveComment($loggedInUser){
-		// Get who wrote the comment
+		//Get comment ID
 		if($CID = $this->applicationView->GetRemoveCommentIDFromGet()){
 			if($CID != -1 && is_numeric($CID)){
 
 				$comment = $this->applicationDAL->GetComment($CID);
 				if(count($comment) == 1){
 					
-					if(count($this->loggedInUser) == 1){
+					if(count($loggedInUser) == 1){
 						// Is it o;ur user?
 						if($comment[0]['AID'] == $loggedInUser[0]['ID']){
 							$this->applicationDAL->RemoveComment($CID);

@@ -106,9 +106,8 @@ class UserController{
 			$friends = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser[0]['ID']);
 			
 			if(!$this->UserIsFriend($friends, $AID)){
-				
 				// Cannot add yourself
-				if($AID != $this->loggedInUser[0]['ID']){
+				if($AID != $loggedInUser[0]['ID']){
 					// Add to database
 					$this->applicationDAL->AddFriend($loggedInUser[0]['ID'], $AID);
 					
@@ -149,13 +148,12 @@ class UserController{
 	 * @var int user ID
 	 */
 	private function UserIsFriend($friends, $userID){
+		var_dump($friends);
 		for ($i=0; $i < count($friends); $i++) { 
-			if($friends[$i]['ID'] == $userID){
+			if($friends[$i]['PID1'] == $userID || $friends[$i]['PID2'] == $userID){
 				return true;
 			}
-			else{
-				return false;
-			}
+			echo $friends[$i]['ID'] . "  " . $userID;
 		}
 		return false;
 	}

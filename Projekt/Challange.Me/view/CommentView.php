@@ -48,17 +48,18 @@ class CommentView{
 	 * @return Start HTML for showwing comment
 	 */
 	public function WriteCommentHTMLStart($comment, $user, $challengeView, $ourUser){
+
 		$html = "
-			<div class='comment' id='" . $comment[0] . "'>
+			<div class='comment' id='" . $comment['ID'] . "'>
 				<label>Posted by: <a href='index.php?" . $this->userIDString . "=". $user['ID'] . " '>". $user['FName'] . " " . $user['LName'] . "</a> </label><br>
 				<label>Title:</label><br>
-				<p> " . $comment[3] . " </p>
+				<p> " . $comment['Title'] . " </p>
 				<label>Comment:</label><br>
-				<p> " . $comment[4] . " </p>";
+				<p> " . $comment['Comment'] . " </p>";
 		// If it´s our comment, we can remove it
 		if($ourUser){
 			$html .= "<a href='index.php?" . $challengeView->GetSeeAChallengeString() . "=" . $_GET[$challengeView->GetSeeAChallengeString()] . "&"
-			. $this->removeCommentString . "=" . $comment[0] . "'>Click here to remove your comment.</a>";
+			. $this->removeCommentString . "=" . $comment['ID'] . "'>Click here to remove your comment.</a>";
 		}
 				
 		$html .= "<hr>";

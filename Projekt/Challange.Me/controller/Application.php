@@ -301,7 +301,7 @@ class Application{
 
 			$this->applicationView->DataBaseError();
 			$htmlError = $this->applicationView->GetErrorsHTML();
-
+			echo $dbex->getMessage();
 			return $htmlError;
 		}
 		// Comething else is wrong!

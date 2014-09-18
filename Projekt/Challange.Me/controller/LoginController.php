@@ -33,7 +33,7 @@ class LoginController{
 	 * @return Bool
 	 */
 	public function SuccessfullLogin($username,$password){
-			
+
 		// Hash password
 		$hPass = $this->loginModel->GetEncryptedString($password);
 		

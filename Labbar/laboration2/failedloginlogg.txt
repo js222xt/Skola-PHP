@@ -22,3 +22,19 @@ Password
 Måndag, den  September år 2014. Klockan är [17:16:44].
 ----------------------------------------------------
 
+[Username]
+Admin
+[Password]
+notcorrect
+[Time]
+Torsdag, den 18  September år 2014. Klockan är [14:46:06].
+----------------------------------------------------
+
+[Username]
+Admina
+[Password]
+Password
+[Time]
+Torsdag, den 18  September år 2014. Klockan är [14:48:36].
+----------------------------------------------------
+

@@ -11,8 +11,8 @@ class ApplicationDAL{
 	
 		
 	private function ConnectToDB(){
-		$this->mysqli = new \mysqli("localhost", "admin", "password");
-		mysqli_select_db($this->mysqli, "challengeme");		
+		$this->mysqli = new \mysqli("localhost", "user", "password");
+		mysqli_select_db($this->mysqli, "brjgames_nu");		
 	}
 	
 	/*
@@ -177,15 +177,15 @@ class ApplicationDAL{
 	/**
 	 * @return Array containing all comments for a challenge
 	 */
-	public function GetComments($challengeID){
+	public function GetComments($CID){
 		
 		$this->ConnectToDB();
 		
-		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($challengeID) . "'");
+		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		
 		$retArray = array();
 		
-		if (!$result = $this->mysqli->query("CALL GetAllComments(@CID)")) {
+		if (!$result = $this->mysqli->query("CALL GetComment(@CID)")) {
 			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{

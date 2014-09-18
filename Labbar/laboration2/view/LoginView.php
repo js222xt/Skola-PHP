@@ -325,9 +325,9 @@ class LoginView{
 		
 		//Get day of the week
 		$dateString .= $this->GetDayOfWeek($today);
-		
+
 		// Check day of the month
-		$dateString .= "den " . $this->GetMonth($today);
+		$dateString .= "den " . $today['mday'] . " " . $this->GetMonth($today);
 		
 		// Check year
 		$dateString .= "år " . $today["year"] . ".";
@@ -536,7 +536,7 @@ class LoginView{
 						 	null,
 						 	null,
 						 	null,
-						 	true); 
+						 	FALSE); 
 			file_put_contents(self::$endTimeFileName, time() + intval(self::$timeInSec));
 		}
 		catch(\Exception $ex){
