@@ -7,6 +7,7 @@ require_once("/common/HTMLPage.php");
 
 // Model
 require_once("/model/LoginModel.php");
+require_once('/model/UserModel.php');
 require_once("/model/db/Connect.php");
 require_once("/model/db/ApplicationDAL.php");
 

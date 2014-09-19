@@ -6,12 +6,19 @@ class UserController{
 	
 	/** @var \view\ApplicationView */
 	private $applicationView;
+	/** @var \model\UserModel */
+	private $userModel;
+	
+	
+	
+	// REMOVE!!
 	/** @var \model\db\ApplicationDAL */
 	private $applicationDAL;
 	
 	public function __construct($appView, $appDAL){
 		$this->applicationView = $appView;
 		$this->applicationDAL = $appDAL;
+		$this->userModel = new \Model\UserModel($appDAL);
 	}
 	
 	/**
@@ -98,139 +105,87 @@ class UserController{
 	public function AddFriendForUser($loggedInUser){
 		// Get ID
 		$AID = $this->applicationView->GetAddUserIDFromGet();
-
-		// Validate
-		if($AID != -1 && is_numeric($AID) && count($this->applicationDAL->GetUSer($AID)) == 1){
-			
-			// Check if we try to add a friend that we already got
-			$friends = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser[0]['ID']);
-			
-			if(!$this->UserIsFriend($friends, $AID)){
-				// Cannot add yourself
-				if($AID != $loggedInUser[0]['ID']){
-					// Add to database
-					$this->applicationDAL->AddFriend($loggedInUser[0]['ID'], $AID);
-					
-					$this->applicationView->AddFriendAddedSucess();
-				}
-				else {
-					$this->applicationView->CannotAddYourselfAsFriend();
-				}
-				
-			}
-			else {
-				$this->applicationView->AlreadyFriends();
-			}
-		}
-		else{
-			$this->applicationView->NoUserFound();
-		}
-	}
-	
-	public function RemoveFriendFromUser($loggedInUser){
-		// Get ID
-		$AID = $this->applicationView->GetRemoveUserIDFromGet();
+		$friends = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser[0]['ID']);
+		$code = $this->userModel->AddFriendForUser($AID, $friends, $loggedInUser);
 		
-		// Validate
-		if($AID != -1 && is_numeric($AID) && count($this->applicationDAL->GetUSer($AID)) == 1){
-			// Remove
-			$this->applicationDAL->RemoveFriend($loggedInUser[0]['ID'], $AID);
-			
-			$this->applicationView->AddFriendRemoveSucess();
-		}
-		else {
-			$this->applicationView->NoUserFound();
+		switch ($code) {
+			case \model\UserModel::AddFriendAddedSucess:
+				$this->applicationView->AddFriendAddedSucess();
+				break;
+			case \model\UserModel::CannotAddYourselfAsFriend:
+				$this->applicationView->CannotAddYourselfAsFriend();
+				break;
+			case \model\UserModel::AlreadyFriends:
+				$this->applicationView->AlreadyFriends();
+				break;
+			case \model\UserModel::NoUserFound:
+				$this->applicationView->NoUserFound();
+				break;
 		}
 	}
 	
-	/**
-	 * @var Array with friends ID´s
-	 * @var int user ID
-	 */
-	private function UserIsFriend($friends, $userID){
-		var_dump($friends);
-		for ($i=0; $i < count($friends); $i++) { 
-			if($friends[$i]['PID1'] == $userID || $friends[$i]['PID2'] == $userID){
-				return true;
-			}
-			echo $friends[$i]['ID'] . "  " . $userID;
+	public function RemoveFriendFromUser($loggedInUser){		
+		
+		// Get ID
+		$AID = $this->applicationView->GetAddUserIDFromGet();
+		$code = $this->userModel->RemoveFriendFromUser($AID, $loggedInUser);
+		
+		switch ($code) {
+			case \model\UserModel::AddFriendRemoveSucess:
+				$this->applicationView->AddFriendRemoveSucess();
+				break;
+			case \model\UserModel::NoUserFound:
+				$this->applicationView->NoUserFound();
+				break;
 		}
-		return false;
 	}
 	
 	public function AdminBanUser($isAdmin, $loggedInUser){
-		if($isAdmin){
-			// Get user ID who is about to get banned
-			$AID = $this->applicationView->GetBanUserIDFromGET();
-			
-			// Get user from DB
-			$user = $this->applicationDAL->GetUser($AID);
-			
-			if(count($user) == 1  && $AID != -1){
-				if($user[0]['ID'] != $loggedInUser[0]['ID']){
-					// Can we ban this user?
-					if(!$user[0]['IsAdmin']){
-						
-						if(!$user[0]['Banned']){
-							// Ban
-							$this->applicationDAL->BanUser($AID);
-							
-							$this->applicationView->AddBanSuccessfull();
-						}
-						else {
-							$this->applicationView->AlreadyBanned($user[0]['ID']);
-						}
-					}
-					else {
-						$this->applicationView->CannotBanAnotherAdmin();
-					}
-				}				
-				else {
-					$this->applicationView->CannotBanYourself();
-				}
-			}
-			else {
+		
+		$AID = $this->applicationView->GetBanUserIDFromGET();
+		$user = $this->applicationDAL->GetUser($AID);
+		$code = $this->userModel->AdminBanUser($AID, $isAdmin, $loggedInUser, $user);
+		
+		switch ($code) {
+			case \model\UserModel::AddBanSuccessfull:
+				$this->applicationView->AddBanSuccessfull();
+				break;
+			case \model\UserModel::AlreadyBanned:
+				$this->applicationView->AlreadyBanned($user[0]['ID']);
+				break;
+			case \model\UserModel::CannotBanAnotherAdmin:
+				$this->applicationView->CannotBanAnotherAdmin();
+				break;
+			case \model\UserModel::CannotBanYourself:
+				$this->applicationView->CannotBanYourself();
+				break;
+			case \model\UserModel::NoUserFound:
 				$this->applicationView->NoUserFound();
-			}						
-		}
-		else {
-			$this->applicationView->NotAdmin();
+				break;
+			case \model\UserModel::NotAdmin:
+				$this->applicationView->NotAdmin();
+				break;
 		}
 	}
 	
 	public function AdminUnbanUser($isAdmin){
-		if($isAdmin){
-			// Get user ID who is about to get banned
-			$AID = $this->applicationView->GetUnBanUserIDFromGET();
-			
-			if($AID != -1 && is_numeric($AID)){
-				// Get user from DB
-				$user = $this->applicationDAL->GetUser($AID);
-
-				if(count($user) == 1){
-					// Can we ban this user?
-					if($user[0]['Banned']){
-						// UnBan
-						$this->applicationDAL->UnBanUser($AID);
-						
-						$this->applicationView->AddUnBanSuccessfull();
-						$successFound = true;
-					}
-					else {
-						$this->applicationView->NotBanned($user[0]['ID']);
-					}	
-				}
-				else {
-					$this->applicationView->NoUserFound();
-				}
-				
-			}					
-			else {
+		
+		$AID = $this->applicationView->GetUnBanUserIDFromGET();
+		$code = $this->AdminUnbanUser($AID, $isAdmin, $loggedInUser, $user);
+		
+		switch ($code) {
+			case \model\UserModel::AddUnBanSuccessfull:
+				$this->applicationView->AddUnBanSuccessfull();
+				break;
+			case \model\UserModel::NotBanned:
+				$this->applicationView->NotBanned($user[0]['ID']);
+				break;
+			case \model\UserModel::NoUserFound:
 				$this->applicationView->NoUserFound();
-			}
-		}
-		else {
-			$this->applicationView->NotAdmin();
+				break;
+			case \model\UserModel::NotAdmin:
+				$this->applicationView->NotAdmin();
+				break;
 		}
 	}
 	

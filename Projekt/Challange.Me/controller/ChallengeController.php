@@ -5,6 +5,8 @@ namespace controller;
 
 class ChallengeController{
 	
+	bryt ut denna klass till model
+	
 	/** @var \view\ApplicationView */
 	private $applicationView;
 	/** @var \model\db\ApplicationDAL */
