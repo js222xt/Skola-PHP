@@ -887,7 +887,7 @@ class ApplicationView{
 	}
 	
 	/**
-	 * @return 
+	 * @return bool
 	 */
 	public function DidUserChoseAnyFriendsToChallenge(){		
 		return isset($_POST[self::$challengeView->GetChallengeAFriendString()]);
