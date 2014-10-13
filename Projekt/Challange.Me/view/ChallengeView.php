@@ -13,8 +13,8 @@ class ChallengeView{
 	private $challengeFriendString = "ChallengeFriend";
 	
 	/**
-	 * @var Array with challenge info
-	 * @var Bool if user already ahs challenge
+	 * @param Array with challenge info
+	 * @param Bool if user already ahs challenge
 	 */
 	public function DisplayChallenge($challenge, $hasChallenge, $isAdmin, $friends){
 
@@ -49,13 +49,13 @@ class ChallengeView{
 
 		if(count($friends) > 0){
 			$html .= "<br><br><form method='post' action='index.php?" . $this->challengeFriendString . "=" . $challenge['ID'] . "'";
-			for ($i=0; $i < count($friends[0]); $i++) {
+			$html .= "<p>Challenge a friend?</p>";
+			for ($i=0; $i < count($friends); $i++) {
 				$html .= "
-				<p> Challenge a friend?</p>
-				<input type='checkbox' name='" . $this->challengeFriendString . "[]' value='" . $friends[0][$i]['ID'] . "'><label>" . $friends[0][$i]['Username'] ."</label><br>
+				<input type='checkbox' name='" . $this->challengeFriendString . "[]' value='" . $friends[$i][0]['ID'] . "'><label>" . $friends[$i][0]['Username'] ."</label><br>
 				";
 			}
-			$html .= "<input type='submit' name='submit' value='Challenge Friends' /><br>
+			$html .= "<input type='submit' name='submit' value='Challenge Friend(s)' /><br>
 						</form>";
 		}
 		

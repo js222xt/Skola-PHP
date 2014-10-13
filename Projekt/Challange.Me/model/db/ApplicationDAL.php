@@ -2,22 +2,21 @@
 
 namespace model\db;
 
-require_once("DBException.php");
 
 class ApplicationDAL{
 	
 	/**@var MySQLi */
-	private $mysqli;
+	protected $mysqli;
 	
 		
-	private function ConnectToDB(){
-		$this->mysqli = new \mysqli("localhost", "user", "password");
-		mysqli_select_db($this->mysqli, "brjgames_nu");		
+	protected function ConnectToDB(){
+		$this->mysqli = new \mysqli("localhost", "admin", "password");
+		mysqli_select_db($this->mysqli, "challengeme");		
 	}
 	
 	/*
 	 * @return Array containing all challenges
-	 */
+	 *
 	public function GetAllChallenges(){
 		$this->ConnectToDB();
 		
@@ -42,7 +41,7 @@ class ApplicationDAL{
 		mysqli_close($this->mysqli);
 		// Return
 		return $retArray;
-	}
+	}*/
 	
 	public function GetChallenge($CID){
 		$this->ConnectToDB();
@@ -72,7 +71,7 @@ class ApplicationDAL{
 	
 	/**
 	 * @return Array containing all challenges
-	 */
+	 *
 	public function GetAllChallangesIDForID($AID){
 		$this->ConnectToDB();
 		
@@ -99,7 +98,7 @@ class ApplicationDAL{
 		mysqli_close($this->mysqli);
 		// Return
 		return $retArray;
-	}
+	}*/
 	
 	
 	/**
@@ -135,12 +134,12 @@ class ApplicationDAL{
 	
 	/**
 	 * Add a challenge to a user
-	 */
+	 *
 	public function TakeChallenge($ID, $challengeID){
 		if (!$this->dbConnection->multi_query("CALL AddChallenge($ID,$challengeID)")) {
 			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
-	}
+	}*/
 	
 	/**
 	 * Return user that can be logged in with this data
@@ -299,6 +298,7 @@ class ApplicationDAL{
 		return $retArray;
 	}
 	
+	/*
 	public function BanUser($AID){
 		$this->ConnectToDB();
 
@@ -325,11 +325,11 @@ class ApplicationDAL{
 		
 		// Free
 		mysqli_close($this->mysqli);
-	}
+	}*/
 	
 	/**
 	 * @return Array containing a user account
-	 */
+	 *
 	public function GetAllUsers(){
 		$this->ConnectToDB();
 		
@@ -354,7 +354,7 @@ class ApplicationDAL{
 		mysqli_close($this->mysqli);
 		// Return
 		return $retArray;
-	}
+	}*/
 	
 	/**
 	 * @return Array with comments on a comment 
@@ -427,7 +427,7 @@ class ApplicationDAL{
 	 * @var int ID
 	 * @var int ID
 	 * Adds a friend
-	 */
+	 
 	public function AddFriend($PID1, $PID2){
 		$this->ConnectToDB();
 		
@@ -441,7 +441,7 @@ class ApplicationDAL{
 		
 		// Free
 		mysqli_close($this->mysqli);
-	}
+	}*/
 	
 	
 	/**
@@ -470,7 +470,7 @@ class ApplicationDAL{
 	 * @var int ID
 	 * @var int ID
 	 * Removes a friend
-	 */
+	 
 	public function RemoveFriend($PID1, $PID2){
 		$this->ConnectToDB();
 		
@@ -485,6 +485,7 @@ class ApplicationDAL{
 		// Free
 		mysqli_close($this->mysqli);
 	}
+	*/
 	
 	/**
 	 * @var int account ID 
@@ -509,7 +510,7 @@ class ApplicationDAL{
 	/**
 	 * @var challenge ID
 	 * Removes a challenge from the database
-	 */
+	 *
 	public function RemoveAChallegneFromDatabase($CID){
 		$this->ConnectToDB();
 		
@@ -522,7 +523,7 @@ class ApplicationDAL{
 		
 		// Free
 		mysqli_close($this->mysqli);
-	}
+	}*/
 	
 	
 	
@@ -548,7 +549,7 @@ class ApplicationDAL{
 	 * @var int account ID 
 	 * @var int challenge ID
 	 * Finish a challenge for a user
-	 */
+	 *
 	public function FinishChallengeForUser($CID, $AID){
 		$this->ConnectToDB();
 		
@@ -562,7 +563,7 @@ class ApplicationDAL{
 		
 		// Free
 		mysqli_close($this->mysqli);
-	}
+	}*/
 	
 	/**
 	 * @var String

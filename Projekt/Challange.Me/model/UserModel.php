@@ -4,8 +4,8 @@ namespace model;
 
 class UserModel{
 	
-	/** @var \model\db\ApplicationDAL */
-	private $applicationDAL;
+	/** @var \model\db\UserDAL */
+	private $userDAL;
 	
 	const AddFriendAddedSucess = 0;
 	const CannotAddYourselfAsFriend = 1;
@@ -21,10 +21,10 @@ class UserModel{
 	const NotBanned = 11;
 	
 	/**
-	 * @param \model\db\ApplicationDAL
+	 * @param \model\db\UserDAL
 	 */
-	public function __construct($appDal){
-		$this->applicationDAL = $appDal;		
+	public function __construct(){
+		$this->userDAL = new \model\db\UserDAL();		
 	}
 	
 	/**
@@ -35,13 +35,13 @@ class UserModel{
 	 */
 	public function AddFriendForUser($AID, $friends, $loggedInUser){
 		// Validate
-		if($AID != -1 && is_numeric($AID) && count($this->applicationDAL->GetUSer($AID)) == 1){
+		if($AID != -1 && is_numeric($AID)){
 			
 			if(!$this->UserIsFriend($friends, $AID)){
 				// Cannot add yourself
 				if($AID != $loggedInUser[0]['ID']){
 					// Add to database
-					$this->applicationDAL->AddFriend($loggedInUser[0]['ID'], $AID);
+					$this->userDAL->AddFriend($loggedInUser[0]['ID'], $AID);
 					
 					return self::AddFriendAddedSucess;
 				}
@@ -67,7 +67,7 @@ class UserModel{
 		// Validate
 		if($AID != -1 && is_numeric($AID) && count($this->applicationDAL->GetUSer($AID)) == 1){
 			// Remove
-			$this->applicationDAL->RemoveFriend($loggedInUser[0]['ID'], $AID);
+			$this->userDAL->RemoveFriend($loggedInUser[0]['ID'], $AID);
 			
 			return self::AddFriendRemoveSucess;
 		}
@@ -92,7 +92,7 @@ class UserModel{
 						
 						if(!$user[0]['Banned']){
 							// Ban
-							$this->applicationDAL->BanUser($AID);
+							$this->userDAL->BanUser($AID);
 							
 							return self::AddBanSuccessfull;
 						}
@@ -124,7 +124,7 @@ class UserModel{
 					// Can we ban this user?
 					if($user[0]['Banned']){
 						// UnBan
-						$this->applicationDAL->UnBanUser($AID);
+						$this->userDAL->UnBanUser($AID);
 						
 						return self::AddUnBanSuccessfull;
 					}
@@ -150,7 +150,7 @@ class UserModel{
 	 * @var Array with friends ID´s
 	 * @var int user ID
 	 */
-	private function UserIsFriend($friends, $userID){
+	public function UserIsFriend($friends, $userID){
 
 		for ($i=0; $i < count($friends); $i++) { 
 			if($friends[$i]['PID1'] == $userID || $friends[$i]['PID2'] == $userID){
@@ -159,6 +159,13 @@ class UserModel{
 			echo $friends[$i]['ID'] . "  " . $userID;
 		}
 		return false;
+	}
+	
+	/**
+	 * @return array with all users
+	 */
+	public function GetAllUsers(){
+		return $this->userDAL->GetAllUsers();
 	}
 	
 }

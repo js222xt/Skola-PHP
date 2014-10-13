@@ -5,34 +5,20 @@ namespace controller;
 
 class ChallengeController{
 	
-	bryt ut denna klass till model
-	
 	/** @var \view\ApplicationView */
 	private $applicationView;
 	/** @var \model\db\ApplicationDAL */
 	private $applicationDAL;
+	/** @var \model\ChallengeModel */
+	private $challengeModel;
 	
 	public function __construct($appView, $appDAL){
 		$this->applicationView = $appView;
 		$this->applicationDAL = $appDAL;
+		$this->challengeModel = new \model\ChallengeModel();
 	}
 		
-	/**
-	 * @var Array with challenges ID´s
-	 * @var int challenge ID
-	 */
-	public function UserHasChallenge($CIDS, $CID){
-		for ($i=0; $i < count($CIDS); $i++) { 
-			if($CIDS[$i]['CID'] == $CID){
-				return true;
-			}
-			else{
-				return false;
-			}
-		}
-		
-		return false;
-	}
+	
 	
 	/**
 	 * @return String HTML
@@ -55,14 +41,14 @@ class ChallengeController{
 		// Show all challenges
 		
 		// Get Array with all challanges
-		$challenges = $this->applicationDAL->GetAllChallenges();
+		$challenges = $this->challengeModel->GetAllChallenges();
 
 		// Get Array with all challanges ID
-		$challengesID = $this->applicationDAL->GetAllChallangesIDForID($loggedInUser[0]['ID']);
+		$challengesID = $this->challengeModel->GetAllChallangesIDForID($loggedInUser[0]['ID']);
 
 		for ($i=0; $i < count($challenges); $i++) {
 			
-				if($this->UserHasChallenge($challengesID, $challenges[$i]['ID'])){
+				if($this->challengeModel->UserHasChallenge($challengesID, $challenges[$i]['ID'])){
 					// Get HTML
 					$html .= $this->applicationView->ShowChallenge($challenges[$i], true, $isAdmin, $challengeFriendHTML);
 				}
@@ -80,7 +66,7 @@ class ChallengeController{
 	public function ShowChallengeHTML($loggedInUser, $friends){
 		$html ="";
 		// Update challenge list from Database
-		$challenges = $this->applicationDAL->GetAllChallenges();
+		$challenges = $this->challengeModel->GetAllChallenges();
 
 		// If we find the challenge
 		$foundChallenge = false;
@@ -111,10 +97,7 @@ class ChallengeController{
 				
 					if(count($user) == 1){
 						// Is it our user?
-						$ourUser = false;
-						if($loggedInUser[0]['ID'] == $user[0]['ID']){
-							$ourUser = true;
-						}
+						$ourUser = $loggedInUser[0]['ID'] == $user[0]['ID'] ? true : false;
 					
 						$html .= $this->applicationView->ShowComment($comments[$i], $user, $ourUser);
 					}
@@ -146,9 +129,9 @@ class ChallengeController{
 	public function GetActiveAndCompletedChallengesHTML($username,$ID, $loggedInUser, $challengeFriendHTML){
 		$html ="";
 		// Get Array with all challanges
-		$challenges = $this->applicationDAL->GetAllChallenges();
+		$challenges = $this->challengeModel->GetAllChallenges();
 		// Get Array with all challanges ID
-		$challengesID = $this->applicationDAL->GetAllChallangesIDForID($ID);
+		$challengesID = $this->challengeModel->GetAllChallangesIDForID($ID);
 		// get all challenges					
 		$myActiveChallenges = array();
 		for ($i=0; $i < count($challenges); $i++) { 
@@ -215,107 +198,82 @@ class ChallengeController{
 	
 	public function RemoveChallengeFromUser($loggedInUser){
 		// Get which one, if -1 error
-		if($CID = $this->applicationView->GetRemoveChallengeIDFromGet()){
-			if($CID != -1 && is_numeric($CID)){
-				// Validate
-			
-				// Does user has the challenge?
-				// Get challenges
-				$challenges = $this->applicationDAL->GetAllChallangesIDForID($loggedInUser[0]['ID']);
-				if($this->UserHasChallenge($challenges, $CID)){
-					
-					// Remove from Database
-					$this->applicationDAL->RemoveChallengeFromUser($CID,$oggedInUser[0]['ID']);
-			
-					$this->applicationView->AddRemoveChallengeSucess();
-				}
-				else {
-					$this->applicationView->UserDoesNotHaveThatChallenge();
-				}
+		$CID = $this->applicationView->GetRemoveChallengeIDFromGet();
+		if($CID != -1 && is_numeric($CID)){
+			// Validate
+		
+			// Does user has the challenge?
+			// Get challenges
+			$challenges = $this->applicationDAL->GetAllChallangesIDForID($loggedInUser[0]['ID']);
+			if($this->UserHasChallenge($challenges, $CID)){
+				
+				// Remove from Database
+				$this->applicationDAL->RemoveChallengeFromUser($CID,$oggedInUser[0]['ID']);
+		
+				$this->applicationView->AddRemoveChallengeSucess();
 			}
 			else {
-				$this->applicationView->AddRemoveChallengeNotFound();
+				$this->applicationView->UserDoesNotHaveThatChallenge();
 			}
-		}		
+		}
+		else {
+			$this->applicationView->AddRemoveChallengeNotFound();
+		}
 	}
 	
 	public function FinishAChallenge($loggedInUser){
 		// Get which one, if -1 error
-		if($CID = $this->applicationView->GetFinishChallengeIDFromGet()){
-			
-			if($CID != -1 && is_numeric($CID)){
-				// Validate
-				
-				// Does user has the challenge?
-				// Get challenges
-				$challenges = $this->applicationDAL->GetAllChallangesIDForID($loggedInUser[0]['ID']);
-				if($this->UserHasChallenge($challenges, $CID)){
-					
-					// Database stuff
-					$this->applicationDAL->FinishChallengeForUser($CID, $loggedInUser[0]['ID']);	
-			
-					$this->applicationView->AddFinishChallengeSucess();
-				}
-				else {
-					$this->applicationView->AddFinishChallengeNotFound();
-				}
-			}
-			
-		}
-		else {
-			$this->applicationView->ChallengeNotFound();
+		$CID = $this->applicationView->GetFinishChallengeIDFromGet();
+		$AID = $loggedInUser[0]['ID'];
+		
+		$code = $this->challengeModel->FinishChallenge($CID, $AID);
+		
+		switch ($code) {
+			case \model\ChallengeModel::AddFinishChallengeSucess :
+				$this->applicationView->AddFinishChallengeSucess();
+				break;
+			case \model\ChallengeModel::AddFinishChallengeNotFound:
+				$this->applicationView->AddFinishChallengeNotFound();
+				break;
+			case \model\ChallengeModel::ChallengeNotFound:
+				$this->applicationView->ChallengeNotFound();
+				break;
 		}
 	}
 	
 	public function TakeChallenge($loggedInUser){
 		// Take the challenge, if id = -1 error
-		if($ID = $this->applicationView->GetTakeChallengeIDFromGet()){
-			if($ID != -1 && is_numeric($ID)){
-				// Get challenges
-				$challenges = $this->applicationDAL->GetAllChallanges();
-				
-				// If we find the challenge
-				$foundChallenge = false;
-				
-				// Get the one we want
-				for ($i=0; $i < count($challenges); $i++) { 
-					if($ID == $challenges[$i][0]){
-						$foundChallenge = true;
-						
-						// Take Challenge
-						$this->applicationDAL->TakeChallenge($loggedInUser[0]['ID'],$ID);
-						$this->applicationView->AddTakeChallengeSucess();							
-					}
-				}
-			
-				// We have not found our challenge!
-				if(!$foundChallenge){
-					$this->applicationView->ChallengeNotFound();
-				}
-			}
-			else {
+		$ID = $this->applicationView->GetTakeChallengeIDFromGet();
+		$AID = $loggedInUser[0]['ID'];
+		
+		$code = $this->challengeModel->TakeChallenge($AID, $ID);
+		
+		switch ($code) {
+			case \model\ChallengeModel::AddTakeChallengeSucess :
+				$this->applicationView->AddTakeChallengeSucess();
+				break;
+			case \model\ChallengeModel::ChallengeNotFound:
 				$this->applicationView->ChallengeNotFound();
-			}
-		}	
+				break;
+		}
 	}
 	
 	public function AdminRemoveChallenge($isAdmin){
-		// If we are admin
-		if($isAdmin){
-			// Get Challegne ID
-			$CID = $this->applicationView->GetDestroyChallengeIDFromGET();
-			
-			if($CID != -1 && is_numeric($CID)){
-				$this->applicationDAL->RemoveAChallegneFromDatabase($CID);
+		// Get Challegne ID
+		$CID = $this->applicationView->GetDestroyChallengeIDFromGET();
 				
+		$code = $this->challengeModel->AdminRemoveChallenge($CID);
+		
+		switch ($code) {
+			case \model\ChallengeModel::AddDestroyChallengeSucess :
 				$this->applicationView->AddDestroyChallengeSucess();
-			}
-			else {
+				break;
+			case \model\ChallengeModel::ChallengeNotFound:
 				$this->applicationView->ChallengeNotFound();
-			}
-		}
-		else {
-			$this->applicationView->NotAdmin();
+				break;
+			case \model\ChallengeModel::NotAdmin:
+				$this->applicationView->NotAdmin();
+				break;
 		}	
 	}
 	
@@ -374,11 +332,11 @@ class ChallengeController{
 	public function ChallengeFriends($loggedInUserID){
 		// Get who
 		$friends = $this->applicationView->GetChallengedFriends();
-		
-		// Get Challegne ID
-		$ID = $this->applicationView->GetChallengeFriendChallengeID();
-		$CID = $ID[0];
-		
+
+		// Get Challenge ID
+		$ID = $this->applicationView->GetChallengeFriendFriendsID();
+		$CID = $this->applicationView->GetChallengeFriendChallengeID();
+
 		if($CID != -1 && is_numeric($CID)){
 			for ($i=0; $i < count($friends); $i++) {
 				// Add notification

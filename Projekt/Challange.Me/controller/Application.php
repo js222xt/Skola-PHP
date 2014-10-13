@@ -8,8 +8,12 @@ require_once("/common/HTMLPage.php");
 // Model
 require_once("/model/LoginModel.php");
 require_once('/model/UserModel.php');
+require_once('/model/ChallengeModel.php');
 require_once("/model/db/Connect.php");
 require_once("/model/db/ApplicationDAL.php");
+require_once("/model/db/UserDAL.php");
+require_once("/model/db/ChallengeDAL.php");
+require_once("/model/db/DBException.php");
 
 // View
 require_once("/view/ApplicationView.php");
@@ -228,7 +232,7 @@ class Application{
 					}
 					// If user wants to see a user
 					if($this->applicationView->UserWantsToSeeAUser()){
-	
+						
 						// Show user
 						$this->body .= $this->userController->ShowUserHTML($this->loggedInUser, $this->challengeController);
 						
@@ -241,7 +245,7 @@ class Application{
 						$this->body .= $this->applicationView->ShowNewChallengesStart();
 						for ($i=0; $i < count($challenged); $i++) { 
 							$this->body .= $this->applicationView->ShowNewChallenges($challenged[$i], $this->applicationDAL->GetChallenge($challenged[$i]['CID']), $this->applicationDAL->
-																																								GetUser($challenged[$i]['CBYID']));
+																																								GetUser($challenged[$i]['CBUID']));
 						}
 						$this->body .= $this->applicationView->ShowNewChallengesEnd();
 						

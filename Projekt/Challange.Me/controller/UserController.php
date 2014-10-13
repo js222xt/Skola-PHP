@@ -18,7 +18,7 @@ class UserController{
 	public function __construct($appView, $appDAL){
 		$this->applicationView = $appView;
 		$this->applicationDAL = $appDAL;
-		$this->userModel = new \Model\UserModel($appDAL);
+		$this->userModel = new \Model\UserModel();
 	}
 	
 	/**
@@ -42,7 +42,7 @@ class UserController{
 					$friend = $this->applicationDAL->GetUser($friendsID[$i]['PID2']);
 				}							
 				
-				$html .= $this->applicationView->ShowFriend($friend, $loggedInUser[0]['IsAdmin'], $friend[$i]['Banned']);
+				$html .= $this->applicationView->ShowFriend($friend, $loggedInUser[0]['IsAdmin'], $friend[0]['Banned']);
 			}
 		}
 		else {
@@ -81,7 +81,7 @@ class UserController{
 		$html = "";
 		
 		// Get all users
-		$users = $this->applicationDAL->GetAllUsers();
+		$users = $this->userModel->GetAllUsers();
 		
 		for ($i=0; $i < count($users); $i++) { 
 			// Are user friend with this user?
@@ -90,7 +90,7 @@ class UserController{
 			// If it´s not us
 			if($users[$i]['ID'] != $loggedInUser[0]['ID']){
 				// Friend allready?
-				if($this->UserIsFriend($friendsID, $users[$i]['ID'])){
+				if($this->userModel->UserIsFriend($friendsID, $users[$i]['ID'])){
 					$html .= $this->applicationView->ShowUser($users[$i], true, $loggedInUser[0]['IsAdmin'], $users[$i]['Banned']);
 				}
 				else {
@@ -200,13 +200,13 @@ class UserController{
 			// Get user
 			$user = $this->applicationDAL->GetUser($ID);
 			if(count($user) == 1){
-				
 				// Show Account information
 				$html .= $this->applicationView->GetAccountInformationHTML($user);
 				
 				// Show all active and completed challenges	
 				$html .= $challengeController->GetActiveAndCompletedChallengesHTML($user[0]['Username'], $ID, $loggedInUser, $this->GetAllFriends($loggedInUser));					
 				
+				return $html;
 			}
 			else {
 				$this->applicationView->NoUserFound();

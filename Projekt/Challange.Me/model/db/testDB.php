@@ -3,7 +3,7 @@
 namespace model\db;
 
 class testDB{
-
+	/*
 		function __construct($con){
 			
 			if (!$con->multi_query("CALL sp_test")) {
@@ -33,7 +33,7 @@ class testDB{
 		
 		/**
 	 * tesst
-	 */
+	 *
 	public function TestGetAccount(){
 		$rs = $this->dbConnection->query( "CALL GetAccount(1, @email)");
 		$rs = $this->dbConnection->query( "SELECT @email ");
@@ -41,5 +41,5 @@ class testDB{
 		{
 			var_dump($row);
 		}
-	}
+	} */
 }

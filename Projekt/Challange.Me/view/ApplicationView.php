@@ -507,6 +507,7 @@ class ApplicationView{
 	 * Return HTML for the friend given
 	 */
 	public function ShowFriend($friend, $isAdmin, $isBanned){
+
 		$html = "
 			<div class='friend'>
 			
@@ -517,7 +518,7 @@ class ApplicationView{
 							<p>Email: <label class='accInfoLabel'>" . $friend[0]['Email'] . "</label> </p>
 							<p>First name: <label class='accInfoLabel'>" . $friend[0]['FName'] . "</label> </p>
 							<p>Last name: <label class='accInfoLabel'>" . $friend[0]['LName'] . "</label> </p>
-							<p>Challenge points: <label class='accInfoLabel'>" . $friend[0]['ChallengePoints'] . "</label> </p>
+							<p>Challenge points: <label class='accInfoLabel'>" . $friend[0]['challengePoints'] . "</label> </p>
 							<p>Banned? <label class='accInfoLabel'>";
 							
 							if((boolean)$isBanned){
@@ -882,8 +883,20 @@ class ApplicationView{
 	/**
 	 * @return String ID
 	 */
-	public function GetChallengeFriendChallengeID(){
+	public function GetChallengeFriendFriendsID(){
 		return $_POST[self::$challengeView->GetChallengeAFriendString()];
+	}
+	
+	/**
+	 * @return String ID
+	 */
+	public function GetChallengeFriendChallengeID(){
+		if(isset($_GET[self::$challengeView->GetChallengeAFriendString()])){
+			return $_GET[self::$challengeView->GetChallengeAFriendString()];
+		}
+		else{
+			return -1;
+		}
 	}
 	
 	/**
