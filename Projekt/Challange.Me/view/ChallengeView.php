@@ -20,35 +20,35 @@ class ChallengeView{
 
 		$html= "
 			<div class='challenge'>
-					<p>Name: <a href='index.php?" . $this->seeAChallengeString . "=" . $challenge['ID'] . "'>" . $challenge['Name'] . "</a> </p>
-					<p>Description: " . $challenge['Description'] . " </p>
-					<p>Accepted: " . $challenge['Accepted'] . " times. </p> 
-					<p>Worth: " . $challenge['WorthChallengePoints']. " Points</p>
-					<p>Completed: " . $challenge['Completed']. " times.</p>";
+					<p>Name: <a href='index.php?" . $this->seeAChallengeString . "=" . $challenge->GetID() . "'>" . $challenge->GetName() . "</a> </p>
+					<p>Description: " . $challenge->GetDescription() . " </p>
+					<p>Accepted: " . $challenge->GetAccepted() . " times. </p> 
+					<p>Worth: " . $challenge->GetWorthChallengePoints(). " Points</p>
+					<p>Completed: " . $challenge->GetCompleted(). " times.</p>";
 					
 		// If user already has challenge
 		if($hasChallenge){						
-			$html .= "<a href='index.php?" . $this->finishChallengeString . "=" . $challenge['ID'] . "' class='completeChallenge' >
+			$html .= "<a href='index.php?" . $this->finishChallengeString . "=" . $challenge->GetID(). "' class='completeChallenge' >
 						Complete Challenge</a>";
 			
-			$html .= "<a href='index.php?" . $this->removeChallengeString . "=" . $challenge['ID'] . "' class='removeChallenge' >
+			$html .= "<a href='index.php?" . $this->removeChallengeString . "=" . $challenge->GetID(). "' class='removeChallenge' >
 						Remove Challenge</a>";
 		}
 		else{
-			$html .= "<a class='button-link' href='index.php?" . $this->seeAChallengeString . "=" . $challenge['ID'] . "&" .
-		 	$this->takeAChallengeString . "=" . $challenge['ID'] . "'>Take Challenge!</a>";	
+			$html .= "<a class='button-link' href='index.php?" . $this->seeAChallengeString . "=" . $challenge->GetID(). "&" .
+		 	$this->takeAChallengeString . "=" . $challenge->GetID(). "'>Take Challenge!</a>";	
 		}
 					
 		// If admin
 		if((boolean)$isAdmin){
-			$html .= "<a class='destroyChallenge' href='index.php?" . $this->destroyChallengeString . "=" . $challenge['ID'] . "&" .
-		 	$this->destroyChallengeString . "=" . $challenge['ID'] . "'>Destroy Challenge!</a>";
+			$html .= "<a class='destroyChallenge' href='index.php?" . $this->destroyChallengeString . "=" . $challenge->GetID(). "&" .
+		 	$this->destroyChallengeString . "=" . $challenge->GetID(). "'>Destroy Challenge!</a>";
 		}
 					
 		// Challenge Friend
 
 		if(count($friends) > 0){
-			$html .= "<br><br><form method='post' action='index.php?" . $this->challengeFriendString . "=" . $challenge['ID'] . "'";
+			$html .= "<br><br><form method='post' action='index.php?" . $this->challengeFriendString . "=" . $challenge->GetID(). "'";
 			$html .= "<p>Challenge a friend?</p>";
 			for ($i=0; $i < count($friends); $i++) {
 				$html .= "

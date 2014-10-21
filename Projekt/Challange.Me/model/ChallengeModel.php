@@ -27,19 +27,26 @@ class ChallengeModel{
 			if($CIDS[$i]['CID'] == $CID){
 				return true;
 			}
-			else{
-				return false;
-			}
 		}
 		
 		return false;
 	}
 	
 	/**
-	 * @return Array with challenges
+	 * @return Array with Challenge objs
 	 */
 	public function GetAllChallenges(){
-		return $this->challengeDAL->GetAllChallenges();
+		// Gets all challenges from database and make new Challenge obj then add them to new list that we return
+		$challengesArray = array();
+		$challenges = $this->challengeDAL->GetAllChallenges();
+		foreach($challenges as $challenge){
+			$challenge = new \model\Challenge($challenge['ID'],$challenge['Name'],$challenge['Description'],$challenge['Accepted'],
+											  $challenge['WorthChallengePoints'],$challenge['Completed']);
+			
+			array_push($challengesArray, $challenge);
+		}
+		
+		return $challengesArray;
 	}
 	
 	/**
@@ -66,7 +73,7 @@ class ChallengeModel{
 				
 				// Database stuff
 				$this->challengeDAL->FinishChallengeForUser($CID, $AID);	
-				
+
 				return self::AddFinishChallengeSucess;
 			}
 			else {
@@ -83,17 +90,17 @@ class ChallengeModel{
 	 * @param int challenge ID
 	 * @return int code
 	 */
-	public function TakeChallenge($AID, $ID){
+	public function TakeChallenge($AID, $ID, $loggedInUser){
 		if($ID != -1 && is_numeric($ID)){
 			// Get challenges
-			$challenges = $this->challengeDAL->GetAllChallanges();
+			$challenges = $this->challengeDAL->GetAllChallenges();
 			
 			// If we find the challenge
 			$foundChallenge = false;
 			
 			// Get the one we want
 			for ($i=0; $i < count($challenges); $i++) { 
-				if($ID == $challenges[$i][0]){
+				if($ID == $challenges[$i]['ID']){
 					$foundChallenge = true;
 					
 					// Take Challenge

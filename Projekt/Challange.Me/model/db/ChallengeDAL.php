@@ -88,9 +88,19 @@ class ChallengeDAL extends ApplicationDAL{
 	 * Add a challenge to a user
 	 */
 	public function TakeChallenge($ID, $challengeID){
-		if (!$this->dbConnection->multi_query("CALL AddChallenge($ID,$challengeID)")) {
+		
+		$this->ConnectToDB();
+		
+		// Prepare IN and OUT parameters
+		$this->mysqli->query("SET @ID = " . "'" . $this->mysqli->real_escape_string($ID) . "'");
+		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($challengeID) . "'");
+		
+		if (!$result = $this->mysqli->query("CALL AddChallenge(@ID,@CID )")) {
 			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
+		}		 
+		
+		// Free
+		mysqli_close($this->mysqli);
 	}
 	
 	/**

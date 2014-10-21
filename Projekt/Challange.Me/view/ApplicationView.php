@@ -451,23 +451,43 @@ class ApplicationView{
 	/**
 	 * @return String HTML
 	 */
-	public function UserHasNoChallengesHTML(){
-		return "
+	public function UserHasNoChallengesHTML($thisUser){
+		if($thisUser){
+			return "
 			<div class='info'>
 				<p> You have no active challenges, browse some <a href='index.php?" . self::$headerView->GetChallengeString() . "'>here</a> :) </p>
 			</div>
-		";		
+			";	
+		}
+		else{
+			return "
+			<div class='info'>
+				<p> User have no active challenges, If it is a friend, browse some <a href='index.php?" . self::$headerView->GetChallengeString() . "'>here</a> and challenge him/her :D</p>
+			</div>
+			";	
+		}
+			
 	}	
 	
 	/**
 	 * @return String HTML
 	 */
-	public function UserHasNoCompletedChallengesHTML(){
-		return "
+	public function UserHasNoCompletedChallengesHTML($thisUser){
+		if($thisUser){
+			return "
 			<div class='info'>
 				<p> Hmm, no completed challenges yet :0, browse some <a href='index.php?" . self::$headerView->GetChallengeString() . "'>here</a> and get to work :D </p>
 			</div>
-		";		
+			";	
+		}
+		else{
+			return "
+			<div class='info'>
+				<p> Hmm, no completed challenges yet :0 If it is a friend, browse some <a href='index.php?" . self::$headerView->GetChallengeString() . "'>here</a> and challenge him/her :D</p>
+			</div>
+		";	
+		}
+			
 	}
 	
 	/**
@@ -612,11 +632,11 @@ class ApplicationView{
 	 * @var Array containing comment for a challenge
 	 * Returns HTML for showing comments and to comment for a challenge
 	 */
-	public function ShowComment($comment, $user, $ourUser){
+	public function ShowComment($comment, $user, $ourUser, $IsAdmin){
 		$html = "";		
 		
 		// Get start HTML for base comment
-		$html .= self::$commentView->WriteCommentHTMLStart($comment, $user[0], self::$challengeView, $ourUser);
+		$html .= self::$commentView->WriteCommentHTMLStart($comment, $user[0], self::$challengeView, $ourUser, $IsAdmin);
 		
 		/*
 		// Get all comments on comment
@@ -1182,15 +1202,6 @@ class ApplicationView{
 		return $html;
 	 }
 	
-	/**
-	 * Called whenever we cannot find the specific challenge we were looking for
-
-	public function ChallengeNotFound(){
-		echo "<p class='Error'> We could not find the challenge you were looking for! Browse all the challenges <a href='index.php?" .
-		 self::$headerView->GetChallengeString() .  "'>here</a></p>";
-	}
-	 * 	 */
-	
 	//=================== PAGES ==============================//
 	
 	/*
@@ -1295,7 +1306,7 @@ class ApplicationView{
 	 * Adds an error
 	 */
 	public function UserDoesNotOwnComment(){
-		array_push($this->errors, "You cannot remove another <a href='index.php?" . self::$headerView->GetChallengeString() . "'>users</a> comment!");
+		array_push($this->errors, "You cannot remove another users comment!");
 	}
 	
 	/**

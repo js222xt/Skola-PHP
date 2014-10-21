@@ -42,12 +42,13 @@ class CommentView{
 	}
 	
 	/**
-	 * @var Comment
-	 * @var User Account 
-	 * @var \view\ChalllengeView to get URL strings
+	 * @param Comment
+	 * @param User Account 
+	 * @param \view\ChalllengeView to get URL strings
+	 * @param bool if current user is Admin
 	 * @return Start HTML for showwing comment
 	 */
-	public function WriteCommentHTMLStart($comment, $user, $challengeView, $ourUser){
+	public function WriteCommentHTMLStart($comment, $user, $challengeView, $ourUser, $isAdmin){
 
 		$html = "
 			<div class='comment' id='" . $comment['ID'] . "'>
@@ -57,7 +58,7 @@ class CommentView{
 				<label>Comment:</label><br>
 				<p> " . $comment['Comment'] . " </p>";
 		// If it´s our comment, we can remove it
-		if($ourUser){
+		if($ourUser || $isAdmin){
 			$html .= "<a href='index.php?" . $challengeView->GetSeeAChallengeString() . "=" . $_GET[$challengeView->GetSeeAChallengeString()] . "&"
 			. $this->removeCommentString . "=" . $comment['ID'] . "'>Click here to remove your comment.</a>";
 		}

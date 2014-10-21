@@ -57,31 +57,33 @@ class CommentController{
 	
 	public function RemoveComment($loggedInUser){
 		//Get comment ID
-		if($CID = $this->applicationView->GetRemoveCommentIDFromGet()){
-			if($CID != -1 && is_numeric($CID)){
+		$CID = $this->applicationView->GetRemoveCommentIDFromGet();
+		if($CID != -1 && is_numeric($CID)){
 
-				$comment = $this->applicationDAL->GetComment($CID);
-				if(count($comment) == 1){
-					
-					if(count($loggedInUser) == 1){
-						// Is it o;ur user?
-						if($comment[0]['AID'] == $loggedInUser[0]['ID']){
-							$this->applicationDAL->RemoveComment($CID);
-							
-							$this->applicationView->AddCommentRemoveSucess();
-						}
-						else {
-							$this->applicationView->UserDoesNotOwnComment();
-						}	
+			$comment = $this->applicationDAL->GetComment($CID);
+
+			if(count($comment) == 1){				
+				if(count($loggedInUser) == 1){
+					// Is it o;ur user?
+					if($comment[0]['AID'] == $loggedInUser[0]['ID']){
+						$this->applicationDAL->RemoveComment($CID);
+						
+						$this->applicationView->AddCommentRemoveSucess();
 					}
 					else {
-						$this->applicationView->NoUserFound();
-					}
+						$this->applicationView->UserDoesNotOwnComment();
+					}	
 				}
 				else {
-					$this->applicationView->CommentNotFound();
+					$this->applicationView->NoUserFound();
 				}
-			}												
+			}
+			else {
+				$this->applicationView->CommentNotFound();
+			}											
 		}
-	}
+		else {
+			$this->applicationView->CommentNotFound();
+		}
+	}	
 }

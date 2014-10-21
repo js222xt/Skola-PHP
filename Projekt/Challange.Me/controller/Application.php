@@ -9,11 +9,15 @@ require_once("/common/HTMLPage.php");
 require_once("/model/LoginModel.php");
 require_once('/model/UserModel.php');
 require_once('/model/ChallengeModel.php');
+require_once('/model/Challenge.php');
+require_once('/model/User.php');
+require_once('/model/Comment.php');
 require_once("/model/db/Connect.php");
 require_once("/model/db/ApplicationDAL.php");
 require_once("/model/db/UserDAL.php");
 require_once("/model/db/ChallengeDAL.php");
 require_once("/model/db/DBException.php");
+
 
 // View
 require_once("/view/ApplicationView.php");
@@ -307,6 +311,7 @@ class Application{
 			$this->applicationView->DataBaseError();
 			$htmlError = $this->applicationView->GetErrorsHTML();
 			echo $dbex->getMessage();
+			var_dump( $dbex->getTrace());
 			return $htmlError;
 		}
 		// Comething else is wrong!
