@@ -162,7 +162,7 @@ class UserModel{
 		return $this->userDAL->GetAllUsers();
 	}
 	
-		/**
+	/**
 	 * @return array with all users
 	 */
 	public function GetUser($ID){

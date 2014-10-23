@@ -1,6 +1,6 @@
 <?php
 
-require_once("controller\Application.php");
+require_once("controller/Application.php");
 
 session_start();
 

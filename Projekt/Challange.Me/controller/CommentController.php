@@ -45,7 +45,7 @@ class CommentController{
 				// Errors?
 				if(!$errorsFound){
 					// Add comment to Database
-					$this->applicationDAL->AddCommentToChallenge($ID, $loggedInUser[0]['ID'], $title, $comment);
+					$this->applicationDAL->AddCommentToChallenge($ID, $loggedInUser->GetID(), $title, $comment);
 					$this->applicationView->AddCommentToChallengeSucess();
 				}
 			}
@@ -64,8 +64,8 @@ class CommentController{
 
 			if(count($comment) == 1){				
 				if(count($loggedInUser) == 1){
-					// Is it o;ur user?
-					if($comment[0]['AID'] == $loggedInUser[0]['ID']){
+					// Is it our user or are we a admin?
+					if($comment[0]['AID'] == $loggedInUser->GetID() || $loggedInUser->GetIsAdmin()){
 						$this->applicationDAL->RemoveComment($CID);
 						
 						$this->applicationView->AddCommentRemoveSucess();

@@ -11,11 +11,14 @@ class ChallengeController{
 	private $applicationDAL;
 	/** @var \model\ChallengeModel */
 	private $challengeModel;
+	/** @var \model\UserModel */
+	private $userModel;
 	
 	public function __construct($appView, $appDAL){
 		$this->applicationView = $appView;
 		$this->applicationDAL = $appDAL;
 		$this->challengeModel = new \model\ChallengeModel();
+		$this->userModel = new \Model\UserModel();
 	}
 		
 	
@@ -90,32 +93,35 @@ class ChallengeController{
 				else{
 					$html .= $this->applicationView->ShowChallenge($challenges[$i], false, $loggedInUser->GetIsAdmin(), $friends);
 				}								
-
+				
 				// Get all comments
 				$comments = $this->applicationDAL->GetComments($challenges[$i]->GetID());
 				
 				// Show comment system
 				$html .= $this->applicationView->ShowCommentSystemStart();
 				
-				for ($i=0; $i < count($comments); $i++) { 
+				if(count($comments) > 0){
+					for ($i=0; $i < count($comments); $i++) { 
 												
-					// Get user who wrote base comment
-
-					$user = $this->applicationDAL->GetUser($comments[$i]['AID']);
-				
-					if(count($user) == 1){
-						// Is it our user?
-						$ourUser = $loggedInUser->GetID() == $user[0]['ID'] ? true : false;
 					
-						$html .= $this->applicationView->ShowComment($comments[$i], $user, $ourUser, $loggedInUser->GetIsAdmin());
-					}
-					else {
-						$this->applicationView->NoUserFound();
-						$errorsFound = true;
+						// Get user who wrote base comment
+	
+						$user = $this->userModel->GetUser($comments[$i]['AID']);
+						
+						if(count($user) == 1){
+							// Is it our user?
+							$ourUser = $loggedInUser->GetID() == $user[0]['ID'] ? true : false;
+						
+							$html .= $this->applicationView->ShowComment($comments[$i], $user, $ourUser, $loggedInUser->GetIsAdmin());
+						}
+						else {
+							$this->applicationView->NoUserFound();
+							$errorsFound = true;
+						}
 					}
 				}
 				
-				$html .= $this->applicationView->ShowCommentSystemEnd();
+				$html .= $this->applicationView->ShowCommentSystemEnd();				
 			}
 		}
 		

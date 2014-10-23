@@ -110,12 +110,12 @@ class ApplicationDAL{
 	public function GetComments($CID){
 		
 		$this->ConnectToDB();
-		
+
 		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
 		
 		$retArray = array();
 		
-		if (!$result = $this->mysqli->query("CALL GetComment(@CID)")) {
+		if (!$result = $this->mysqli->query("CALL GetAllComments(@CID)")) {
 			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
 		}
 		else{
@@ -237,7 +237,6 @@ class ApplicationDAL{
 		}		 
 		
 		// Free
-		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
 	}
 	
@@ -259,7 +258,6 @@ class ApplicationDAL{
 		}		 
 		
 		// Free
-		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
 	}
 	
@@ -280,7 +278,6 @@ class ApplicationDAL{
 		}		 
 		
 		// Free
-		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
 	}
 	

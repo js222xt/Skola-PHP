@@ -3,26 +3,26 @@
 namespace controller;
 
 // Common
-require_once("/common/HTMLPage.php");
+require_once("./common/HTMLPage.php");
 
 // Model
-require_once("/model/LoginModel.php");
-require_once('/model/UserModel.php');
-require_once('/model/ChallengeModel.php');
-require_once('/model/Challenge.php');
-require_once('/model/User.php');
-require_once('/model/Comment.php');
-require_once("/model/db/Connect.php");
-require_once("/model/db/ApplicationDAL.php");
-require_once("/model/db/UserDAL.php");
-require_once("/model/db/ChallengeDAL.php");
-require_once("/model/db/DBException.php");
+require_once("./model/LoginModel.php");
+require_once('./model/UserModel.php');
+require_once('./model/ChallengeModel.php');
+require_once('./model/Challenge.php');
+require_once('./model/User.php');
+require_once('./model/Comment.php');
+require_once("./model/db/Connect.php");
+require_once("./model/db/ApplicationDAL.php");
+require_once("./model/db/UserDAL.php");
+require_once("./model/db/ChallengeDAL.php");
+require_once("./model/db/DBException.php");
 
 
 // View
-require_once("/view/ApplicationView.php");
-require_once("/view/HeaderView.php");
-require_once("/view/FooterView.php");
+require_once("./view/ApplicationView.php");
+require_once("./view/HeaderView.php");
+require_once("./view/FooterView.php");
 
 // Controller
 require_once("LoginController.php");
@@ -139,8 +139,8 @@ class Application{
 						}											
 						
 						// Show the challenge
-						$this->body .= $this->challengeController->ShowChallengeHTML($this->loggedInUser, $this->userController->GetAllFriends($this->loggedInUser));
 						
+						$this->body .= $this->challengeController->ShowChallengeHTML($this->loggedInUser, $this->userController->GetAllFriends($this->loggedInUser));						
 					}
 					// If MyStuff
 					else if($this->applicationView->IsAtMyStuff()){
@@ -264,17 +264,19 @@ class Application{
 				}		
 			}
 			else {
-			// User wants to register new account
+				// User wants to register new account
 				if($this->applicationView->UserWantsToRegisterNewAccount()){
 					
 					// Get HTML
 					$this->body .= $this->loginController->RegisterNewAccountHTML();
 				}
+				else{
+					$this->WriteLoginHTML();
+				}
 			}
 
-			if(!$this->loggedInUser->GetIsBanned()){
-				$this->WriteLoginHTML();
-			}
+			
+
 				
 
 			//================= HTML OUTPUT =====================//
@@ -312,6 +314,7 @@ class Application{
 
 			$this->applicationView->DataBaseError();
 			$htmlError = $this->applicationView->GetErrorsHTML();
+			echo $dbex->getMessage();
 			return $htmlError;
 		}
 		// Comething else is wrong!
