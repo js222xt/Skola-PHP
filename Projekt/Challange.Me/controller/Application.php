@@ -103,12 +103,12 @@ class Application{
 				// Update user
 				$this->loggedInUser = $this->loginController->GetLoggedInUser();
 				
-				$isAdmin = $this->loggedInUser[0]['IsAdmin'];
-				$isBanned = $this->loggedInUser[0]['Banned'];
-					
+				$isAdmin = $this->loggedInUser->GetIsAdmin();
+				$isBanned = $this->loggedInUser->GetIsBanned();
+
 				if(!$isBanned){						
 											
-					if($this->loggedInUser[0]['IsAdmin']){
+					if($this->loggedInUser->GetIsAdmin()){
 						$this->body .= $this->challengeController->ShowAddChallengeHTML();	
 					}
 					
@@ -122,7 +122,7 @@ class Application{
 						$this->body .= $this->challengeController->GetChallengesHTML($this->loggedInUser, $this->userController->GetAllFriends($this->loggedInUser));
 							
 					}			
-					// If user want sto see a specific challenge
+					// If user wants to see a specific challenge
 					else if($this->applicationView->UserWantsToSeeAChallenge()){				
 						
 						// Check if user wanted to post a comment
@@ -146,14 +146,12 @@ class Application{
 					else if($this->applicationView->IsAtMyStuff()){
 						// Show my stuff
 						
-						// Show all active challenges
-						
-						$this->body .= $this->challengeController->GetActiveAndCompletedChallengesHTML(null,$this->loggedInUser[0]['ID'], $this->loggedInUser, $this->userController->
-																																								GetAllFriends($this->loggedInUser));						
-						
 						// Show Account information
 						$this->body .= $this->applicationView->GetAccountInformationHTML($this->loggedInUser);
 						
+						// Show all active challenges						
+						$this->body .= $this->challengeController->GetActiveAndCompletedChallengesHTML(null,$this->loggedInUser->GetID(), $this->loggedInUser, $this->userController->
+																																								GetAllFriends($this->loggedInUser));
 					}
 					// If Friends
 					else if($this->applicationView->IsAtFriends()){
@@ -211,7 +209,7 @@ class Application{
 						if($this->applicationView->DidUserChoseAnyFriendsToChallenge()){
 							
 							// Challenge them
-							$this->challengeController->ChallengeFriends($this->loggedInUser[0]['ID']);
+							$this->challengeController->ChallengeFriends($this->loggedInUser->GetID());
 						}
 					}
 					// Admin wants to add a challenge
@@ -232,7 +230,7 @@ class Application{
 					else if($this->applicationView->AdminWantsToUnBanAUser()){
 						
 						//Unban
-						$this->userController->AdminUnbanUser($isAdmin);
+						$this->userController->AdminUnbanUser($isAdmin, $this->loggedInUser);
 					}
 					// If user wants to see a user
 					if($this->applicationView->UserWantsToSeeAUser()){
@@ -242,19 +240,23 @@ class Application{
 						
 					}
 					if($this->applicationView->UserWantsToSeeNewChallenges()){
-						// Get all the challenges that user has ben challenged with
-						$challenged = $this->applicationDAL->GetAllChallengesUserChallnegedWith($this->loggedInUser[0]['ID']);
+						// Get all the challenges that user has been challenged with
+						$challenged = $this->applicationDAL->GetAllChallengesUserChallnegedWith($this->loggedInUser->GetID());
 						
-						// Get HTML
-						$this->body .= $this->applicationView->ShowNewChallengesStart();
-						for ($i=0; $i < count($challenged); $i++) { 
-							$this->body .= $this->applicationView->ShowNewChallenges($challenged[$i], $this->applicationDAL->GetChallenge($challenged[$i]['CID']), $this->applicationDAL->
-																																								GetUser($challenged[$i]['CBUID']));
-						}
-						$this->body .= $this->applicationView->ShowNewChallengesEnd();
-						
-						// Mark them as read
-						$this->applicationDAL->MarkChallengedAsRead($this->loggedInUser[0]['ID']);
+						if(count($challenged) > 0){
+							// Get HTML
+							$this->body .= $this->applicationView->ShowNewChallengesStart();
+							for ($i=0; $i < count($challenged); $i++) {
+								$userArray= $this->applicationDAL->GetUser($challenged[$i]['CBUID']);
+								$user = new \model\User($userArray[0]['ID'],$userArray[0]['Username'],$userArray[0]['APassword'],$userArray[0]['Email'],
+														$userArray[0]['FName'],$userArray[0]['LName'],$userArray[0]['challengePoints'],$userArray[0]['IsAdmin'],$userArray[0]['Banned']);
+								$this->body .= $this->applicationView->ShowNewChallenges($challenged[$i], $this->applicationDAL->GetChallenge($challenged[$i]['CID']), $user);
+							}
+							$this->body .= $this->applicationView->ShowNewChallengesEnd();
+							
+							// Mark them as read
+							$this->applicationDAL->MarkChallengedAsRead($this->loggedInUser->GetID());
+						}						
 					}
 				}
 				else{
@@ -270,7 +272,7 @@ class Application{
 				}
 			}
 
-			if(!$this->loggedInUser[0]['Banned']){
+			if(!$this->loggedInUser->GetIsBanned()){
 				$this->WriteLoginHTML();
 			}
 				
@@ -310,12 +312,10 @@ class Application{
 
 			$this->applicationView->DataBaseError();
 			$htmlError = $this->applicationView->GetErrorsHTML();
-			echo $dbex->getMessage();
-			var_dump( $dbex->getTrace());
 			return $htmlError;
 		}
 		// Comething else is wrong!
-		catch (Exception $ex){
+		catch (\Exception $ex){
 			$this->applicationView->UnexpectedError();
 			$htmlError = $this->applicationView->GetErrorsHTML();
 			
@@ -332,7 +332,7 @@ class Application{
 	
 	private function CheckNotifications(){
 		// Have user got challenged?
-		$unreadChallengesNotifications = $this->applicationDAL->GetUnreadChallengesNotifications($this->loggedInUser[0]['ID']);
+		$unreadChallengesNotifications = $this->applicationDAL->GetUnreadChallengesNotifications($this->loggedInUser->GetID());
 		
 		// Add HTML
 		$this->body .= $this->applicationView->GetNotificationBarHTML($unreadChallengesNotifications);

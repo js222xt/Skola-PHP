@@ -104,7 +104,7 @@ class ChallengeModel{
 					$foundChallenge = true;
 					
 					// Take Challenge
-					$this->challengeDAL->TakeChallenge($loggedInUser[0]['ID'],$ID);
+					$this->challengeDAL->TakeChallenge($loggedInUser->GetID(),$ID);
 					
 					return self::AddTakeChallengeSucess;					
 				}

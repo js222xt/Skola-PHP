@@ -65,7 +65,7 @@ class UserDAL extends ApplicationDAL{
 	 * @param ID of user to unban
 	 */
 	public function UnBanUser($AID){
-		//$this->ConnectToDB();
+		$this->ConnectToDB();
 
 		// Prepare IN and OUT parameters
 		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
@@ -103,6 +103,37 @@ class UserDAL extends ApplicationDAL{
 		// Free
 		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
+		// Return
+		return $retArray;
+	}
+	
+	/**
+	 * @return Array containing a user account
+	 */
+	public function GetUser($AID){
+		$this->ConnectToDB();
+		
+		$retArray = array();
+		// Prepare IN and OUT parameters
+		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
+		
+		if (!$result = $this->mysqli->query("CALL GetUser(@AID)")) {
+			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
+		}
+		else{
+			
+			if($result->num_rows > 0) 
+			{
+			    while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
+			    {
+			    	array_push($retArray, $row);
+			    }
+			}			
+		}
+		
+		// Free
+		mysqli_free_result($result);
+		//mysqli_close($this->mysqli);
 		// Return
 		return $retArray;
 	}

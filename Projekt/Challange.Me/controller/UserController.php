@@ -27,7 +27,7 @@ class UserController{
 	public function GetFriendsHTML($loggedInUser){
 		$html ="";
 		// get all user friends
-		$friendsID = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser[0]['ID']);
+		$friendsID = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser->GetID());
 		
 		if(count($friendsID) != 0){
 			// We have friends
@@ -35,14 +35,17 @@ class UserController{
 			// Show them
 			for ($i=0; $i < count($friendsID); $i++) {
 				// Get this friend
-				if($friendsID[$i]['PID1'] != $loggedInUser[0]['ID']){
-					$friend = $this->applicationDAL->GetUser($friendsID[$i]['PID1']);
+				if($friendsID[$i]['PID1'] != $loggedInUser->GetID()){
+					$friendAr = $this->userModel->GetUser($friendsID[$i]['PID1']);
 				}
 				else {
-					$friend = $this->applicationDAL->GetUser($friendsID[$i]['PID2']);
+					$friendAr = $this->userModel->GetUser($friendsID[$i]['PID2']);
 				}							
 				
-				$html .= $this->applicationView->ShowFriend($friend, $loggedInUser[0]['IsAdmin'], $friend[0]['Banned']);
+				$friend = new \model\User($friendAr[0]['ID'],$friendAr[0]['Username'],$friendAr[0]['APassword'],$friendAr[0]['Email'],
+											$friendAr[0]['FName'],$friendAr[0]['challengePoints'],$friendAr[0]['LName'] ,$friendAr[0]['IsAdmin'],$friendAr[0]['Banned']);
+				
+				$html .= $this->applicationView->ShowFriend($friend, $loggedInUser->GetIsAdmin(), $friend->GetIsBanned());
 			}
 		}
 		else {
@@ -55,17 +58,17 @@ class UserController{
 	
 	public function GetAllFriends($loggedInUser){
 		// get all user friends
-		$friendsID = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser[0]['ID']);
+		$friendsID = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser->GetID());
 		
 		$friends = array();
 		// Add them
 			for ($i=0; $i < count($friendsID); $i++) {
 				// Get this friend
-				if($friendsID[$i]['PID1'] != $loggedInUser[0]['ID']){
-					$friend = $this->applicationDAL->GetUser($friendsID[$i]['PID1']);
+				if($friendsID[$i]['PID1'] != $loggedInUser->GetID()){
+					$friend = $this->userModel->GetUser($friendsID[$i]['PID1']);
 				}
 				else {
-					$friend = $this->applicationDAL->GetUser($friendsID[$i]['PID2']);
+					$friend = $this->userModel->GetUser($friendsID[$i]['PID2']);
 				}							
 				
 				array_push($friends, $friend);
@@ -81,20 +84,25 @@ class UserController{
 		$html = "";
 		
 		// Get all users
-		$users = $this->userModel->GetAllUsers();
+		$usersArray = $this->userModel->GetAllUsers();
+		$users = array();
+		foreach($usersArray as $user){
+			array_push($users, new \model\User($user['ID'],$user['Username'],$user['APassword'],$user['Email'],
+											   $user['FName'],$user['challengePoints'],$user['LName'] ,$user['IsAdmin'],$user['Banned']));
+		}
 		
 		for ($i=0; $i < count($users); $i++) { 
 			// Are user friend with this user?
-			$friendsID = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser[0]['ID']);
+			$friendsID = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser->GetID());
 			
 			// If it´s not us
-			if($users[$i]['ID'] != $loggedInUser[0]['ID']){
+			if($users[$i]->GetID() != $loggedInUser->GetID()){
 				// Friend allready?
-				if($this->userModel->UserIsFriend($friendsID, $users[$i]['ID'])){
-					$html .= $this->applicationView->ShowUser($users[$i], true, $loggedInUser[0]['IsAdmin'], $users[$i]['Banned']);
+				if($this->userModel->UserIsFriend($friendsID, $users[$i]->GetID())){
+					$html .= $this->applicationView->ShowUser($users[$i], true, $loggedInUser->GetIsAdmin(), $users[$i]->GetIsBanned());
 				}
 				else {
-					$html .= $this->applicationView->ShowUser($users[$i], false, $loggedInUser[0]['IsAdmin'], $users[$i]['Banned']);
+					$html .= $this->applicationView->ShowUser($users[$i], false, $loggedInUser->GetIsAdmin(), $users[$i]->GetIsBanned());
 				}
 			}						
 		}
@@ -105,7 +113,7 @@ class UserController{
 	public function AddFriendForUser($loggedInUser){
 		// Get ID
 		$AID = $this->applicationView->GetAddUserIDFromGet();
-		$friends = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser[0]['ID']);
+		$friends = $this->applicationDAL->GetAllFriendsIDForUser($loggedInUser->GetID());
 		$code = $this->userModel->AddFriendForUser($AID, $friends, $loggedInUser);
 		
 		switch ($code) {
@@ -127,7 +135,7 @@ class UserController{
 	public function RemoveFriendFromUser($loggedInUser){		
 		
 		// Get ID
-		$AID = $this->applicationView->GetAddUserIDFromGet();
+		$AID = $this->applicationView->GetRemoveUserIDFromGet();
 		$code = $this->userModel->RemoveFriendFromUser($AID, $loggedInUser);
 		
 		switch ($code) {
@@ -143,7 +151,9 @@ class UserController{
 	public function AdminBanUser($isAdmin, $loggedInUser){
 		
 		$AID = $this->applicationView->GetBanUserIDFromGET();
-		$user = $this->applicationDAL->GetUser($AID);
+		$userArray = $this->userModel->GetUser($AID);
+		$user = new \model\User($userArray[0]['ID'],$userArray[0]['Username'],$userArray[0]['APassword'],$userArray[0]['Email'],
+								$userArray[0]['FName'],$userArray[0]['LName'],$userArray[0]['challengePoints'] ,$userArray[0]['IsAdmin'],$userArray[0]['Banned']);
 		$code = $this->userModel->AdminBanUser($AID, $isAdmin, $loggedInUser, $user);
 		
 		switch ($code) {
@@ -151,7 +161,7 @@ class UserController{
 				$this->applicationView->AddBanSuccessfull();
 				break;
 			case \model\UserModel::AlreadyBanned:
-				$this->applicationView->AlreadyBanned($user[0]['ID']);
+				$this->applicationView->AlreadyBanned($user->GetID());
 				break;
 			case \model\UserModel::CannotBanAnotherAdmin:
 				$this->applicationView->CannotBanAnotherAdmin();
@@ -168,17 +178,24 @@ class UserController{
 		}
 	}
 	
-	public function AdminUnbanUser($isAdmin){
+	/**
+	 * @param bool if user is admin
+	 * @param User obj of current logged in user
+	 */
+	public function AdminUnbanUser($isAdmin, $loggedInUser){
 		
 		$AID = $this->applicationView->GetUnBanUserIDFromGET();
-		$code = $this->AdminUnbanUser($AID, $isAdmin, $loggedInUser, $user);
+		$userArray = $this->userModel->GetUser($AID);
+		$user = new \model\User($userArray[0]['ID'],$userArray[0]['Username'],$userArray[0]['APassword'],$userArray[0]['Email'],
+								$userArray[0]['FName'],$userArray[0]['LName'],$userArray[0]['challengePoints'] ,$userArray[0]['IsAdmin'],$userArray[0]['Banned']);
+		$code = $this->userModel->AdminUnbanUser($AID, $isAdmin, $loggedInUser, $user);
 		
 		switch ($code) {
 			case \model\UserModel::AddUnBanSuccessfull:
 				$this->applicationView->AddUnBanSuccessfull();
 				break;
 			case \model\UserModel::NotBanned:
-				$this->applicationView->NotBanned($user[0]['ID']);
+				$this->applicationView->NotBanned($user->GetID());
 				break;
 			case \model\UserModel::NoUserFound:
 				$this->applicationView->NoUserFound();
@@ -198,13 +215,16 @@ class UserController{
 	
 		if($ID != -1 && is_numeric($ID)){
 			// Get user
-			$user = $this->applicationDAL->GetUser($ID);
-			if(count($user) == 1){
+			$userArray = $this->userModel->GetUser($ID);
+			
+			if(count($userArray) == 1){
+				$user = new \model\User($userArray[0]['ID'],$userArray[0]['Username'],$userArray[0]['APassword'],$userArray[0]['Email'],
+										$userArray[0]['FName'],$userArray[0]['LName'],$userArray[0]['challengePoints'] ,$userArray[0]['IsAdmin'],$userArray[0]['Banned']);
 				// Show Account information
 				$html .= $this->applicationView->GetAccountInformationHTML($user);
 				
 				// Show all active and completed challenges	
-				$html .= $challengeController->GetActiveAndCompletedChallengesHTML($user[0]['Username'], $ID, $loggedInUser, $this->GetAllFriends($loggedInUser));					
+				$html .= $challengeController->GetActiveAndCompletedChallengesHTML($user->GetUsername(), $ID, $loggedInUser, $this->GetAllFriends($loggedInUser));					
 				
 				return $html;
 			}

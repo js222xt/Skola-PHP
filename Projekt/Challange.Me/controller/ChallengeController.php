@@ -30,10 +30,10 @@ class ChallengeController{
 	/**
 	 * @return String HTML
 	 */
-	public function GetChallengesHTML($loggedInUser, $challengeFriendHTML){
+	public function GetChallengesHTML($loggedInUser, $friends){
 		
-		$isAdmin = $loggedInUser[0]['IsAdmin'];
-		$isBanned = $loggedInUser[0]['Banned'];
+		$isAdmin = $loggedInUser->GetIsAdmin();
+		$isBanned = $loggedInUser->GetIsBanned();
 		
 		$html ="";
 		$html.= $this->applicationView->GetChallengeHeaderHTML();
@@ -44,16 +44,16 @@ class ChallengeController{
 		$challenges = $this->challengeModel->GetAllChallenges();
 
 		// Get Array with all challanges ID
-		$challengesID = $this->challengeModel->GetAllChallangesIDForID($loggedInUser[0]['ID']);
+		$challengesID = $this->challengeModel->GetAllChallangesIDForID($loggedInUser->GetID());
 		
 		for ($i=0; $i < count($challenges); $i++) {
 		
 			if($this->challengeModel->UserHasChallenge($challengesID, $challenges[$i]->GetID())){
 				// Get HTML
-				$html .= $this->applicationView->ShowChallenge($challenges[$i], true, $isAdmin, $challengeFriendHTML);
+				$html .= $this->applicationView->ShowChallenge($challenges[$i], true, $isAdmin, $friends);
 			}
 			else{
-				$html .= $this->applicationView->ShowChallenge($challenges[$i], false, $isAdmin, $challengeFriendHTML);
+				$html .= $this->applicationView->ShowChallenge($challenges[$i], false, $isAdmin, $friends);
 			}					
 		}
 		
@@ -80,8 +80,16 @@ class ChallengeController{
 
 				$foundChallenge = true;
 				
-				// Show challenge!
-				$html .= $this->applicationView->ShowDetailedChallenge($challenges[$i], $loggedInUser[0]['ID'], $loggedInUser[0]['IsAdmin'], $friends);							
+				// Get Array with all challanges ID
+				$challengesID = $this->challengeModel->GetAllChallangesIDForID($loggedInUser->GetID());
+
+				if($this->challengeModel->UserHasChallenge($challengesID, $challenges[$i]->GetID())){
+					// Get HTML
+					$html .= $this->applicationView->ShowChallenge($challenges[$i], true, $loggedInUser->GetIsAdmin(), $friends);
+				}
+				else{
+					$html .= $this->applicationView->ShowChallenge($challenges[$i], false, $loggedInUser->GetIsAdmin(), $friends);
+				}								
 
 				// Get all comments
 				$comments = $this->applicationDAL->GetComments($challenges[$i]->GetID());
@@ -97,9 +105,9 @@ class ChallengeController{
 				
 					if(count($user) == 1){
 						// Is it our user?
-						$ourUser = $loggedInUser[0]['ID'] == $user[0]['ID'] ? true : false;
+						$ourUser = $loggedInUser->GetID() == $user[0]['ID'] ? true : false;
 					
-						$html .= $this->applicationView->ShowComment($comments[$i], $user, $ourUser, $loggedInUser[0]['IsAdmin']);
+						$html .= $this->applicationView->ShowComment($comments[$i], $user, $ourUser, $loggedInUser->GetIsAdmin());
 					}
 					else {
 						$this->applicationView->NoUserFound();
@@ -137,7 +145,7 @@ class ChallengeController{
 		for ($i=0; $i < count($challenges); $i++) { 
 			for ($j=0; $j < count($challengesID); $j++) {
 				// If ID match 
-				if($challenges[$i][0] == $challengesID[$j]['CID']){
+				if($challenges[$i]->GetID() == $challengesID[$j]['ID']){
 					// Add
 					array_push($myActiveChallenges, $challenges[$i]);
 				}
@@ -146,16 +154,16 @@ class ChallengeController{
 
 		if(count($myActiveChallenges) > 0){
 			// Get HTML
-			if($this->loggedInUser[0]['ID'] == $ID){
-				$html .= $this->applicationView->GetMyActiveChallengesHeaderHTML($username, true, $loggedInUser[0]['ID']);
+			if($this->loggedInUser->GetID() == $ID){
+				$html .= $this->applicationView->GetMyActiveChallengesHeaderHTML($username, true, $loggedInUser->GetID());
 			}
 			else {
 				$html.= $this->applicationView->GetMyActiveChallengesHeaderHTML($username, false, $ID);
 			}
-			$html.= $this->applicationView->ShowChallenges($myActiveChallenges, true, $loggedInUser[0]['IsAdmin'], $challengeFriendHTML);
+			$html.= $this->applicationView->ShowChallenges($myActiveChallenges, true, $loggedInUser->GetIsAdmin(), $challengeFriendHTML);
 		}
 		else{
-			if($loggedInUser[0]['ID'] == $ID){
+			if($loggedInUser->GetID() == $ID){
 				$html .= $this->applicationView->UserHasNoChallengesHTML(true);
 			}
 			else {
@@ -183,17 +191,17 @@ class ChallengeController{
 		}
 		if(count($myCompletedChallenges) > 0){
 			// Get HTML
-			if($loggedInUser[0]['ID'] == $ID){
-				$html .= $this->applicationView->GetMyCompletedChallengesHeaderHTML($username, true, $loggedInUser[0]['ID']);
+			if($loggedInUser->GetID() == $ID){
+				$html .= $this->applicationView->GetMyCompletedChallengesHeaderHTML($username, true, $loggedInUser->GetID());
 			}
 			else {
 				$html .= $this->applicationView->GetMyCompletedChallengesHeaderHTML($username, false, $ID);
 			}
 
-			$html .= $this->applicationView->ShowChallenges($myCompletedChallenges, false, $loggedInUser[0]['ID'], $challengeFriendHTML);
+			$html .= $this->applicationView->ShowChallenges($myCompletedChallenges, false, $loggedInUser->GetID(), $challengeFriendHTML);
 		}
 		else{
-			if($loggedInUser[0]['ID'] == $ID){
+			if($loggedInUser->GetID() == $ID){
 				$html .= $this->applicationView->UserHasNoCompletedChallengesHTML(true);
 			}
 			else{
@@ -213,11 +221,11 @@ class ChallengeController{
 		
 			// Does user has the challenge?
 			// Get challenges
-			$challenges = $this->applicationDAL->GetAllChallangesIDForID($loggedInUser[0]['ID']);
-			if($this->UserHasChallenge($challenges, $CID)){
+			$challenges = $this->challengeModel->GetAllChallangesIDForID($loggedInUser->GetID());
+			if($this->challengeModel->UserHasChallenge($challenges, $CID)){
 				
 				// Remove from Database
-				$this->applicationDAL->RemoveChallengeFromUser($CID,$oggedInUser[0]['ID']);
+				$this->applicationDAL->RemoveChallengeFromUser($CID,$loggedInUser->GetID());
 		
 				$this->applicationView->AddRemoveChallengeSucess();
 			}
@@ -233,7 +241,7 @@ class ChallengeController{
 	public function FinishAChallenge($loggedInUser){
 		// Get which one, if -1 error
 		$CID = $this->applicationView->GetFinishChallengeIDFromGet();
-		$AID = $loggedInUser[0]['ID'];
+		$AID = $loggedInUser->GetID();
 		
 		$code = $this->challengeModel->FinishAChallenge($CID, $AID);
 
@@ -253,7 +261,7 @@ class ChallengeController{
 	public function TakeChallenge($loggedInUser){
 		// Take the challenge, if id = -1 error
 		$ID = $this->applicationView->GetTakeChallengeIDFromGet();
-		$AID = $loggedInUser[0]['ID'];
+		$AID = $loggedInUser->GetID();
 		
 		$code = $this->challengeModel->TakeChallenge($AID, $ID, $loggedInUser);
 		
@@ -300,18 +308,24 @@ class ChallengeController{
 				$description = $this->applicationView->GetNewChallengeDescriptionFromPOST();
 				$worth = $this->applicationView->GetNewChallengeWorthFromPOST();
 				
+				$errorsFound = false;
+				
 				// Validate
 				if(strlen($name) == 0 || strlen($name) > 200){
 					$this->applicationView->NewChallengeNameInvalid();
+					$errorsFound = true;
 				}
-				if(strlen($description) == 0 || strlen($description) > 250){
+				if(strlen(trim($description)) == 0 || strlen($description) > 250){
 					$this->applicationView->NewChallengeDescriptionInvalid();
+					$errorsFound = true;
 				}
 				if(!is_numeric($worth)){
 					$this->applicationView->NewChallengeWorthNumericInvalid();
+					$errorsFound = true;
 				}
 				if($worth < 0 || $worth > 1000000000){
 					$this->applicationView->NewChallengeWorthBoundsInvalid();
+					$errorsFound = true;
 				}
 				
 				if(!$errorsFound){

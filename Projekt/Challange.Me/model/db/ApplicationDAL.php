@@ -11,37 +11,8 @@ class ApplicationDAL{
 		
 	protected function ConnectToDB(){
 		$this->mysqli = new \mysqli("localhost", "admin", "password");
-		mysqli_select_db($this->mysqli, "challengeme");		
+		mysqli_select_db($this->mysqli, "challengeme");	
 	}
-	
-	/*
-	 * @return Array containing all challenges
-	 *
-	public function GetAllChallenges(){
-		$this->ConnectToDB();
-		
-		$retArray = array();
-		
-		if (!$result = $this->mysqli->query("CALL GetAllChallenges")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-		else{
-			
-			if($result->num_rows > 0) 
-			{
-			    while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
-			    {
-			    	array_push($retArray, $row);
-			    }
-			}			
-		}
-		
-		// Free
-		mysqli_free_result($result);
-		mysqli_close($this->mysqli);
-		// Return
-		return $retArray;
-	}*/
 	
 	public function GetChallenge($CID){
 		$this->ConnectToDB();
@@ -68,37 +39,6 @@ class ApplicationDAL{
 		// Return
 		return $retArray;
 	}
-	
-	/**
-	 * @return Array containing all challenges
-	 *
-	public function GetAllChallangesIDForID($AID){
-		$this->ConnectToDB();
-		
-		$retArray = array();
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL GetAllChallangesForID(@AID)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-		else{
-			
-			if($result->num_rows > 0) 
-			{
-			    while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
-			    {
-			    	array_push($retArray, $row);
-			    }
-			}			
-		}
-		
-		// Free
-		mysqli_free_result($result);
-		mysqli_close($this->mysqli);
-		// Return
-		return $retArray;
-	}*/
 	
 	
 	/**
@@ -131,15 +71,6 @@ class ApplicationDAL{
 		// Return
 		return $retArray;
 	}
-	
-	/**
-	 * Add a challenge to a user
-	 *
-	public function TakeChallenge($ID, $challengeID){
-		if (!$this->dbConnection->multi_query("CALL AddChallenge($ID,$challengeID)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-	}*/
 	
 	/**
 	 * Return user that can be logged in with this data
@@ -266,122 +197,7 @@ class ApplicationDAL{
 		// Return
 		return $retArray;
 	}
-	
-	/**
-	 * @return Array containing a user account
-	 */
-	public function GetUser($AID){
-		$this->ConnectToDB();
-		
-		$retArray = array();
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL GetUser(@AID)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-		else{
-			
-			if($result->num_rows > 0) 
-			{
-			    while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
-			    {
-			    	array_push($retArray, $row);
-			    }
-			}			
-		}
-		
-		// Free
-		mysqli_free_result($result);
-		mysqli_close($this->mysqli);
-		// Return
-		return $retArray;
-	}
-	
-	/*
-	public function BanUser($AID){
-		$this->ConnectToDB();
 
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL BanUser(@AID)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-		
-		// Free
-		mysqli_close($this->mysqli);
-	}
-	
-	public function UnBanUser($AID){
-		//$this->ConnectToDB();
-
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL UnbanUser(@AID)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-		
-		// Free
-		mysqli_close($this->mysqli);
-	}*/
-	
-	/**
-	 * @return Array containing a user account
-	 *
-	public function GetAllUsers(){
-		$this->ConnectToDB();
-		
-		$retArray = array();
-		
-		if (!$result = $this->mysqli->query("CALL GetAllUsers()")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-		else{
-			
-			if($result->num_rows > 0) 
-			{
-			    while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
-			    {
-			    	array_push($retArray, $row);
-			    }
-			}			
-		}
-		
-		// Free
-		mysqli_free_result($result);
-		mysqli_close($this->mysqli);
-		// Return
-		return $retArray;
-	}*/
-	
-	/**
-	 * @return Array with comments on a comment 
-	 */
-	public function GetCommentsOnComment($CID){
-		if (!$this->dbConnection->multi_query("CALL GetCommentOnComment($CID)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}
-		else {
-			$retArray;
-			do {
-			    if ($res = $this->dbConnection->store_result()) {
-			    	// Get all results
-					$retArray = $res->fetch_all();
-
-			        $res->free();
-			    } else {
-			        if ($this->dbConnection->errno) {
-			            echo "Store failed: (" . $this->dbConnection->errno . ") " . $this->dbConnection->error;
-			        }
-			    }
-			} while ($this->dbConnection->more_results() && $this->dbConnection->next_result());
-			
-			return $retArray;
-		}
-	}
-	
 	/**
 	 * Adds a comment to a comment
 	 */
@@ -399,6 +215,7 @@ class ApplicationDAL{
 		}		 
 		
 		// Free
+		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
 	}
 	
@@ -420,28 +237,9 @@ class ApplicationDAL{
 		}		 
 		
 		// Free
+		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
 	}
-	
-	/**
-	 * @var int ID
-	 * @var int ID
-	 * Adds a friend
-	 
-	public function AddFriend($PID1, $PID2){
-		$this->ConnectToDB();
-		
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @PID1 = " . "'" . $this->mysqli->real_escape_string($PID1) . "'");
-		$this->mysqli->query("SET @PID2 = " . "'" . $this->mysqli->real_escape_string($PID2) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL AddFriend(@PID1,@PID2)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}		 
-		
-		// Free
-		mysqli_close($this->mysqli);
-	}*/
 	
 	
 	/**
@@ -461,31 +259,9 @@ class ApplicationDAL{
 		}		 
 		
 		// Free
+		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
 	}
-	
-	
-	
-	/**
-	 * @var int ID
-	 * @var int ID
-	 * Removes a friend
-	 
-	public function RemoveFriend($PID1, $PID2){
-		$this->ConnectToDB();
-		
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @PID1 = " . "'" . $this->mysqli->real_escape_string($PID1) . "'");
-		$this->mysqli->query("SET @PID2 = " . "'" . $this->mysqli->real_escape_string($PID2) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL RemoveFriend(@PID1,@PID2)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}		 
-		
-		// Free
-		mysqli_close($this->mysqli);
-	}
-	*/
 	
 	/**
 	 * @var int account ID 
@@ -504,27 +280,9 @@ class ApplicationDAL{
 		}		 
 		
 		// Free
+		mysqli_free_result($result);
 		mysqli_close($this->mysqli);
 	}
-	
-	/**
-	 * @var challenge ID
-	 * Removes a challenge from the database
-	 *
-	public function RemoveAChallegneFromDatabase($CID){
-		$this->ConnectToDB();
-		
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL RemoveChallengeFromDB(@CID)")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}		 
-		
-		// Free
-		mysqli_close($this->mysqli);
-	}*/
-	
 	
 	
 	/**
@@ -544,26 +302,6 @@ class ApplicationDAL{
 		// Free
 		mysqli_close($this->mysqli);
 	}
-	
-	/**
-	 * @var int account ID 
-	 * @var int challenge ID
-	 * Finish a challenge for a user
-	 *
-	public function FinishChallengeForUser($CID, $AID){
-		$this->ConnectToDB();
-		
-		// Prepare IN and OUT parameters
-		$this->mysqli->query("SET @CID = " . "'" . $this->mysqli->real_escape_string($CID) . "'");
-		$this->mysqli->query("SET @AID = " . "'" . $this->mysqli->real_escape_string($AID) . "'");
-		
-		if (!$result = $this->mysqli->query("CALL FinishChallengeForUser(@AID,@CID )")) {
-			throw new DBConnectionException($this->mysqli->error, $this->mysqli->errno);
-		}		 
-		
-		// Free
-		mysqli_close($this->mysqli);
-	}*/
 	
 	/**
 	 * @var String

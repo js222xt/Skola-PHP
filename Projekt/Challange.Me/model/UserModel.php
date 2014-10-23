@@ -39,9 +39,9 @@ class UserModel{
 			
 			if(!$this->UserIsFriend($friends, $AID)){
 				// Cannot add yourself
-				if($AID != $loggedInUser[0]['ID']){
+				if($AID != $loggedInUser->GetID()){
 					// Add to database
-					$this->userDAL->AddFriend($loggedInUser[0]['ID'], $AID);
+					$this->userDAL->AddFriend($loggedInUser->GetID(), $AID);
 					
 					return self::AddFriendAddedSucess;
 				}
@@ -65,9 +65,9 @@ class UserModel{
 	 */
 	public function RemoveFriendFromUser($AID, $loggedInUser){
 		// Validate
-		if($AID != -1 && is_numeric($AID) && count($this->applicationDAL->GetUSer($AID)) == 1){
+		if($AID != -1 && is_numeric($AID) && count($this->userDAL->GetUser($AID)) == 1){
 			// Remove
-			$this->userDAL->RemoveFriend($loggedInUser[0]['ID'], $AID);
+			$this->userDAL->RemoveFriend($loggedInUser->GetID(), $AID);
 			
 			return self::AddFriendRemoveSucess;
 		}
@@ -85,12 +85,12 @@ class UserModel{
 	public function AdminBanUser($AID, $isAdmin, $loggedInUser, $user){
 		if($isAdmin){
 			
-			if(count($user) == 1  && $AID != -1){
-				if($user[0]['ID'] != $loggedInUser[0]['ID']){
+			if(count($user) == 1  && $AID != -1 && is_numeric($AID)){
+				if($user->GetID() != $loggedInUser->GetID()){
 					// Can we ban this user?
-					if(!$user[0]['IsAdmin']){
+					if(!$user->GetIsAdmin()){
 						
-						if(!$user[0]['Banned']){
+						if(!$user->GetIsBanned()){
 							// Ban
 							$this->userDAL->BanUser($AID);
 							
@@ -118,24 +118,19 @@ class UserModel{
 	}
 	
 	public function AdminUnbanUser($AID, $isAdmin, $loggedInUser, $user){
+
 		if($isAdmin){			
 			if($AID != -1 && is_numeric($AID)){
-				if(count($user) == 1){
-					// Can we ban this user?
-					if($user[0]['Banned']){
-						// UnBan
-						$this->userDAL->UnBanUser($AID);
-						
-						return self::AddUnBanSuccessfull;
-					}
-					else {
-						return self::NotBanned;
-					}	
+				// Can we ban this user?
+				if($user->GetIsBanned()){
+					// UnBan
+					$this->userDAL->UnBanUser($AID);
+					
+					return self::AddUnBanSuccessfull;
 				}
 				else {
-					return self::NoUserFound;
-				}
-				
+					return self::NotBanned;
+				}				
 			}					
 			else {
 				return self::NoUserFound;
@@ -156,7 +151,6 @@ class UserModel{
 			if($friends[$i]['PID1'] == $userID || $friends[$i]['PID2'] == $userID){
 				return true;
 			}
-			echo $friends[$i]['ID'] . "  " . $userID;
 		}
 		return false;
 	}
@@ -166,6 +160,13 @@ class UserModel{
 	 */
 	public function GetAllUsers(){
 		return $this->userDAL->GetAllUsers();
+	}
+	
+		/**
+	 * @return array with all users
+	 */
+	public function GetUser($ID){
+		return $this->userDAL->GetUser($ID);
 	}
 	
 }

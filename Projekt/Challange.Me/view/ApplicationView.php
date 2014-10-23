@@ -392,11 +392,11 @@ class ApplicationView{
 		$html .= "
 			<div id='accountInfo'>
 				<h3>Account Information</h3>
-				<p>Username: <label class='accInfoLabel'><a href='index.php?" . self::$commentView->GetUserIDString() ."=" . $user[0]['ID'] ."'>" . $user[0]['Username'] . "</a></label> </p>
-				<p>Email: <label class='accInfoLabel'>" . $user[0]['Email'] . "</label> </p>
-				<p>First name: <label class='accInfoLabel'>" . $user[0]['FName'] . "</label> </p>
-				<p>Last name: <label class='accInfoLabel'>" . $user[0]['LName'] . "</label> </p>
-				<p>Challenge points: <label class='accInfoLabel'>" . $user[0]['challengePoints'] . "</label> </p>
+				<p>Username: <label class='accInfoLabel'><a href='index.php?" . self::$commentView->GetUserIDString() ."=" . $user->GetID() ."'>" . $user->GetUsername() . "</a></label> </p>
+				<p>Email: <label class='accInfoLabel'>" . $user->GetEmail() . "</label> </p>
+				<p>First name: <label class='accInfoLabel'>" . $user->GetFirstname() . "</label> </p>
+				<p>Last name: <label class='accInfoLabel'>" . $user->GetLastname(). "</label> </p>
+				<p>Challenge points: <label class='accInfoLabel'>" . $user->GetChallengePoints(). "</label> </p>
 			</div>	
 		";
 		
@@ -526,7 +526,9 @@ class ApplicationView{
 	 * @var Array with friend info
 	 * Return HTML for the friend given
 	 */
-	public function ShowFriend($friend, $isAdmin, $isBanned){
+	public function ShowFriend($friend, $isAdmin){
+		
+		
 
 		$html = "
 			<div class='friend'>
@@ -534,14 +536,14 @@ class ApplicationView{
 		";
 			$html .= "	<div id='accountInfo'>
 							<h3>Friend?</h3>
-							<p>Username: <label class='accInfoLabel'><a href='index.php?" . self::$commentView->GetUserIDString() ."=" . $friend[0]['ID'] ."'>" . $friend[0]['Username'] . "</a></label> </p>
-							<p>Email: <label class='accInfoLabel'>" . $friend[0]['Email'] . "</label> </p>
-							<p>First name: <label class='accInfoLabel'>" . $friend[0]['FName'] . "</label> </p>
-							<p>Last name: <label class='accInfoLabel'>" . $friend[0]['LName'] . "</label> </p>
-							<p>Challenge points: <label class='accInfoLabel'>" . $friend[0]['challengePoints'] . "</label> </p>
+							<p>Username: <label class='accInfoLabel'><a href='index.php?" . self::$commentView->GetUserIDString() ."=" . $friend->GetID() ."'>" . $friend->GetUsername() . "</a></label> </p>
+							<p>Email: <label class='accInfoLabel'>" . $friend->GetEmail() . "</label> </p>
+							<p>First name: <label class='accInfoLabel'>" . $friend->GetFirstname() . "</label> </p>
+							<p>Last name: <label class='accInfoLabel'>" . $friend->GetLastname(). "</label> </p>
+							<p>Challenge points: <label class='accInfoLabel'>" . $friend->GetChallengePoints(). "</label> </p>
 							<p>Banned? <label class='accInfoLabel'>";
 							
-							if((boolean)$isBanned){
+							if((boolean)$friend->GetIsBanned()){
 								$html .= "YES :(";
 							} 
 							else {
@@ -551,14 +553,14 @@ class ApplicationView{
 							$html .="</label></p>
 							";
 							
-							$html .= "<a class='removeChallenge' href='index.php?" . $this->removeFriendString ."=" . $friend[0]['ID'] . "'>Remove Friend</a>";
+							$html .= "<a class='removeChallenge' href='index.php?" . $this->removeFriendString ."=" . $friend->GetID() . "'>Remove Friend</a>";
 		
-		if((boolean)$isAdmin && !(boolean)$friend[0]['IsAdmin']){
-			if(!(boolean)$isBanned){
-				$html .= "<a class='destroyChallenge' href='index.php?" . $this->banUserID . "=" . $friend[0]['ID'] ."' >BAN USER!</a>";
+		if((boolean)$isAdmin && !(boolean)$friend->GetIsAdmin()){
+			if(!(boolean)$friend->GetIsBanned()){
+				$html .= "<a class='destroyChallenge' href='index.php?" . $this->banUserID . "=" . $friend->GetID() ."' >BAN USER!</a>";
 			}
 			else {
-				$html .= "<a class='completeChallenge' href='index.php?" . $this->unbanUserID . "=" . $friend[0]['ID'] ."' >UNBAN USER!</a>";
+				$html .= "<a class='completeChallenge' href='index.php?" . $this->unbanUserID . "=" . $friend->GetID() ."' >UNBAN USER!</a>";
 			}			
 		}
 		
@@ -574,11 +576,11 @@ class ApplicationView{
 
 		$html = "<div id='accountInfo'>
 							<h3>Challenger:</h3>
-							<p>Username: <label class='accInfoLabel'><a href='index.php?" . self::$commentView->GetUserIDString() ."=" . $user['ID'] ."'>" . $user['Username'] . "</a></label> </p>
-							<p>Email: <label class='accInfoLabel'>" . $user['Email'] . "</label> </p>
-							<p>First name: <label class='accInfoLabel'>" . $user['FName'] . "</label> </p>
-							<p>Last name: <label class='accInfoLabel'>" . $user['LName'] . "</label> </p>
-							<p>Challenge points: <label class='accInfoLabel'>" . $user['challengePoints'] . "</label> </p>
+							<p>Username: <label class='accInfoLabel'><a href='index.php?" . self::$commentView->GetUserIDString() ."=" . $user->GetID() ."'>" . $user->GetUsername() . "</a></label> </p>
+							<p>Email: <label class='accInfoLabel'>" . $user->GetEmail() . "</label> </p>
+							<p>First name: <label class='accInfoLabel'>" . $user->GetFirstname(). "</label> </p>
+							<p>Last name: <label class='accInfoLabel'>" . $user->GetLastname(). "</label> </p>
+							<p>Challenge points: <label class='accInfoLabel'>" . $user->GetChallengePoints(). "</label> </p>
 							<p>Banned? <label class='accInfoLabel'";
 							
 							if((boolean)$isBanned){
@@ -592,15 +594,15 @@ class ApplicationView{
 							";
 		// If not friend
 		if(!$isFriend){
-			$html .= "<a class='completeChallenge' href='index.php?" . $this->addUserString . "=" . $user['ID'] . "' >Become Internet STALKER</a>";
+			$html .= "<a class='completeChallenge' href='index.php?" . $this->addUserString . "=" . $user->GetID(). "' >Become Internet STALKER</a>";
 		}
 		
-		if((boolean)$isAdmin && !(boolean)$user['IsAdmin']){
+		if((boolean)$isAdmin && !(boolean)$user->GetIsAdmin()){
 			if(!(boolean)$isBanned){
-				$html .= "<a class='destroyChallenge' href='index.php?" . $this->banUserID . "=" . $user['ID'] ."' >BAN USER!</a>";
+				$html .= "<a class='destroyChallenge' href='index.php?" . $this->banUserID . "=" . $user->GetID() ."' >BAN USER!</a>";
 			}
 			else {
-				$html .= "<a class='completeChallenge' href='index.php?" . $this->unbanUserID . "=" . $user['ID'] ."' >UNBAN USER!</a>";
+				$html .= "<a class='completeChallenge' href='index.php?" . $this->unbanUserID . "=" . $user->GetID() ."' >UNBAN USER!</a>";
 			}			
 		}
 		
@@ -685,14 +687,6 @@ class ApplicationView{
 	 */
 	public function UserWantsToRegisterNewAccount(){
 		return isset($_GET[self::$loginView->GetRegisterString()]);
-	}
-	
-	/*
-	 * @var Array
-	 * Return HTML for the challenge given
-	 */
-	public function ShowDetailedChallenge($challenge, $hasChallenge, $isAdmnin, $friends){	
-		return self::$challengeView->DisplayChallenge($challenge, $hasChallenge, $isAdmnin, $friends);
 	}
 	
 	/**
@@ -1127,16 +1121,16 @@ class ApplicationView{
 	 }
 	 
 	 /**
-	  * @var Array with all the challenges the user has benn challenged with
+	  * @param Array with all the challenges the user has benn challenged with
 	  * @return String HTML
 	  */
 	 public function ShowNewChallenges($challenged, $challenge, $user){
-	 	//var_dump($user);
+		
 	 	$html = "
 	 		<div class='challenge'>
 			<p>Name: <a href='index.php?" . self::$challengeView->GetSeeAChallengeString() . "=" . $challenged['CID'] . "'>" . $challenge[0]['Name']. " </a></p>
-			<p>Challenged by: <a href='index.php?" . self::$commentView->GetUserIDString() . "=" . $user[0]['ID'] . "'>" . $user[0]['Username'] ." (" . $user[0]['FName'] ." 
-																																					" . $user[0]['LName'] .")</a> </p>
+			<p>Challenged by: <a href='index.php?" . self::$commentView->GetUserIDString() . "=" . $user->GetID() . "'>" . $user->GetUsername()." (" . $user->GetFirstname() ." 
+																																					" . $user->GetLastname().")</a> </p>
 		";
 		
 		
@@ -1175,8 +1169,8 @@ class ApplicationView{
 							<input type='text' name='". $this->registerLName . "' >
 							</input>	<br>
 							<button class='.button-link' type='submit'>Register</button>
-						</form>
-					</div>";
+					</form>
+				</div>";
 		
 		return $html;
 	}
@@ -1576,7 +1570,7 @@ class ApplicationView{
 	 * Adds success message
 	 */
 	public function AddAddNewChallengeSucess(){
-		array_push($this->succeded, "The challenge have been added to the database!");
+		array_push($this->succeded, "The challenge has been added to the database!");
 	}
 	
 	/**

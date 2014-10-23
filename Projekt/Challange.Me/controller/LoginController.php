@@ -9,7 +9,7 @@ class LoginController{
 	private $applicationDAL;
 	/** @var \view\ApplicationView */
 	private $applicationView;	
-	/** @var Array containing user information */
+	/** @var User containing user information */
 	private $loggedInUser;
 	/** @var Bool */
 	private $isLoggedInWithPost = false;
@@ -43,7 +43,8 @@ class LoginController{
 		// Can only be one user
 		if(count($user) == 1){
 			// Save user
-			$this->loggedInUser = $user;
+			$this->loggedInUser = new \model\User($user[0]['ID'],$user[0]['Username'],$user[0]['APassword'],$user[0]['Email'],
+												  $user[0]['FName'],$user[0]['challengePoints'],$user[0]['LName'] ,$user[0]['IsAdmin'],$user[0]['Banned']);
 			
 			return true;
 		}
@@ -159,7 +160,7 @@ class LoginController{
 			$this->applicationView->setCookies();
 			$this->applicationView->setRemeberMessage();
 		}
-		$this->applicationView->setLoggedInUserMessage($this->loggedInUser[0]['ID']);
+		$this->applicationView->setLoggedInUserMessage($this->loggedInUser->GetID());
 		$html = $this->applicationView->getLoggedInHTML();
 		return $html;
 	}
