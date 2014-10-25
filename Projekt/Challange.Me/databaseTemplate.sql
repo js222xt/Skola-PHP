@@ -94,6 +94,7 @@ BEGIN
     	DELETE FROM activechallenges WHERE AID = _AID AND CID = _CID;
         UPDATE challenges SET Completed = Completed + 1;
         UPDATE account SET challengePoints = challengePoints + (SELECT WorthChallengePoints FROM challenges WHERE ID = _CID);
+	INSERT INTO completedchallenges VALUES (NULL , _AID, _CID);
 	END;
     END IF;
     COMMIT;
