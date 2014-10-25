@@ -151,7 +151,7 @@ class ChallengeController{
 		for ($i=0; $i < count($challenges); $i++) { 
 			for ($j=0; $j < count($challengesID); $j++) {
 				// If ID match 
-				if($challenges[$i]->GetID() == $challengesID[$j]['ID']){
+				if($challenges[$i]->GetID() == $challengesID[$j]['CID']){
 					// Add
 					array_push($myActiveChallenges, $challenges[$i]);
 				}
@@ -159,8 +159,9 @@ class ChallengeController{
 		}
 
 		if(count($myActiveChallenges) > 0){
+			echo "ad";
 			// Get HTML
-			if($this->loggedInUser->GetID() == $ID){
+			if($loggedInUser->GetID() == $ID){
 				$html .= $this->applicationView->GetMyActiveChallengesHeaderHTML($username, true, $loggedInUser->GetID());
 			}
 			else {
@@ -186,7 +187,7 @@ class ChallengeController{
 		for ($i=0; $i < count($challenges); $i++) { 
 			for ($j=0; $j < count($completedChallengesID); $j++) {
 				// If ID match 
-				if($challenges[$i]['ID'] == $completedChallengesID[$j]['CID']){
+				if($challenges[$i]->GetID() == $completedChallengesID[$j]['CID']){
 					// No point in showing a challenge more then once
 					if(!in_array($challenges[$i], $myCompletedChallenges)){
 						// Add
@@ -195,6 +196,7 @@ class ChallengeController{
 				}
 			}
 		}
+
 		if(count($myCompletedChallenges) > 0){
 			// Get HTML
 			if($loggedInUser->GetID() == $ID){
