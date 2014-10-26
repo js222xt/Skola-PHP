@@ -63,20 +63,15 @@ class CommentController{
 			$comment = $this->applicationDAL->GetComment($CID);
 
 			if(count($comment) == 1){				
-				if(count($loggedInUser) == 1){
-					// Is it our user or are we a admin?
-					if($comment[0]['AID'] == $loggedInUser->GetID() || $loggedInUser->GetIsAdmin()){
-						$this->applicationDAL->RemoveComment($CID);
-						
-						$this->applicationView->AddCommentRemoveSucess();
-					}
-					else {
-						$this->applicationView->UserDoesNotOwnComment();
-					}	
+				// Is it our user or are we a admin?
+				if($comment[0]['AID'] == $loggedInUser->GetID() || $loggedInUser->GetIsAdmin()){
+					$this->applicationDAL->RemoveComment($CID);
+					
+					$this->applicationView->AddCommentRemoveSucess();
 				}
 				else {
-					$this->applicationView->NoUserFound();
-				}
+					$this->applicationView->UserDoesNotOwnComment();
+				}	
 			}
 			else {
 				$this->applicationView->CommentNotFound();

@@ -10,8 +10,8 @@ class ApplicationDAL{
 	
 		
 	protected function ConnectToDB(){
-		$this->mysqli = new \mysqli("localhost", "admin", "password");
-		mysqli_select_db($this->mysqli, "challengeme");	
+		$this->mysqli = new \mysqli("brjgames.nu.mysql", "brjgames_nu", "P9RQLBhg");
+		mysqli_select_db($this->mysqli, "brjgames_nu");	
 	}
 	
 	public function GetChallenge($CID){

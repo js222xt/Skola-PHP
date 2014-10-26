@@ -99,7 +99,7 @@ class ChallengeController{
 				
 				// Show comment system
 				$html .= $this->applicationView->ShowCommentSystemStart();
-				
+
 				if(count($comments) > 0){
 					for ($i=0; $i < count($comments); $i++) { 
 												
@@ -165,9 +165,9 @@ class ChallengeController{
 				$html .= $this->applicationView->GetMyActiveChallengesHeaderHTML($username, true, $loggedInUser->GetID());
 			}
 			else {
-				$html.= $this->applicationView->GetMyActiveChallengesHeaderHTML($username, false, $ID);
+				$html .=  $this->applicationView->GetMyActiveChallengesHeaderHTML($username, false, $ID);
 			}
-			$html.= $this->applicationView->ShowChallenges($myActiveChallenges, true, $loggedInUser->GetIsAdmin(), $challengeFriendHTML);
+			$html .= $this->applicationView->ShowChallenges($myActiveChallenges, true, $loggedInUser->GetIsAdmin(), $challengeFriendHTML);
 		}
 		else{
 			if($loggedInUser->GetID() == $ID){
@@ -177,7 +177,7 @@ class ChallengeController{
 				$html .= $this->applicationView->UserHasNoChallengesHTML(false);
 			}
 		}
-		
+
 		// Show all my completed challenges
 	
 		// Get Array with all completed challanges ID
@@ -206,7 +206,7 @@ class ChallengeController{
 				$html .= $this->applicationView->GetMyCompletedChallengesHeaderHTML($username, false, $ID);
 			}
 
-			$html .= $this->applicationView->ShowChallenges($myCompletedChallenges, false, $loggedInUser->GetID(), $challengeFriendHTML);
+			$html .= $this->applicationView->ShowChallenges($myCompletedChallenges, false, $loggedInUser->GetIsAdmin(), $challengeFriendHTML);
 		}
 		else{
 			if($loggedInUser->GetID() == $ID){
@@ -216,7 +216,7 @@ class ChallengeController{
 				$html .= $this->applicationView->UserHasNoCompletedChallengesHTML(false);
 			}
 		}
-		
+
 		return $html;
 	}
 	
@@ -287,7 +287,7 @@ class ChallengeController{
 		// Get Challegne ID
 		$CID = $this->applicationView->GetDestroyChallengeIDFromGET();
 				
-		$code = $this->challengeModel->AdminRemoveChallenge($CID);
+		$code = $this->challengeModel->AdminRemoveChallenge($isAdmin, $CID);
 		
 		switch ($code) {
 			case \model\ChallengeModel::AddDestroyChallengeSucess :

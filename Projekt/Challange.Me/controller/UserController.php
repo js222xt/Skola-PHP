@@ -43,7 +43,7 @@ class UserController{
 				}							
 				
 				$friend = new \model\User($friendAr[0]['ID'],$friendAr[0]['Username'],$friendAr[0]['APassword'],$friendAr[0]['Email'],
-											$friendAr[0]['FName'],$friendAr[0]['challengePoints'],$friendAr[0]['LName'] ,$friendAr[0]['IsAdmin'],$friendAr[0]['Banned']);
+											$friendAr[0]['FName'],$friendAr[0]['LName'],$friendAr[0]['challengePoints'] ,$friendAr[0]['IsAdmin'],$friendAr[0]['Banned']);
 				
 				$html .= $this->applicationView->ShowFriend($friend, $loggedInUser->GetIsAdmin(), $friend->GetIsBanned());
 			}
@@ -88,7 +88,7 @@ class UserController{
 		$users = array();
 		foreach($usersArray as $user){
 			array_push($users, new \model\User($user['ID'],$user['Username'],$user['APassword'],$user['Email'],
-											   $user['FName'],$user['challengePoints'],$user['LName'] ,$user['IsAdmin'],$user['Banned']));
+											   $user['FName'],$user['LName'],$user['challengePoints'] ,$user['IsAdmin'],$user['Banned']));
 		}
 		
 		for ($i=0; $i < count($users); $i++) { 
@@ -235,5 +235,9 @@ class UserController{
 		else {
 			$this->applicationView->NoUserFound();
 		}
+	}
+	
+	public function GetUser($ID){
+		return $this->userModel->GetUser($ID);
 	}
 }

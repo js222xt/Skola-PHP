@@ -247,7 +247,7 @@ class Application{
 							// Get HTML
 							$this->body .= $this->applicationView->ShowNewChallengesStart();
 							for ($i=0; $i < count($challenged); $i++) {
-								$userArray= $this->applicationDAL->GetUser($challenged[$i]['CBUID']);
+								$userArray = $this->userController->GetUser($challenged[$i]['CBUID']);
 								$user = new \model\User($userArray[0]['ID'],$userArray[0]['Username'],$userArray[0]['APassword'],$userArray[0]['Email'],
 														$userArray[0]['FName'],$userArray[0]['LName'],$userArray[0]['challengePoints'],$userArray[0]['IsAdmin'],$userArray[0]['Banned']);
 								$this->body .= $this->applicationView->ShowNewChallenges($challenged[$i], $this->applicationDAL->GetChallenge($challenged[$i]['CID']), $user);
@@ -263,22 +263,16 @@ class Application{
 					$this->applicationView->Banned();
 				}		
 			}
-			else {
-				// User wants to register new account
-				if($this->applicationView->UserWantsToRegisterNewAccount()){
-					
-					// Get HTML
-					$this->body .= $this->loginController->RegisterNewAccountHTML();
-				}
-				else{
-					$this->WriteLoginHTML();
-				}
-			}
-
-			
-
+			// User wants to register new account
+			if($this->applicationView->UserWantsToRegisterNewAccount()){
 				
-
+				// Get HTML
+				$this->body .= $this->loginController->RegisterNewAccountHTML();
+			}
+			else{
+				$this->WriteLoginHTML();
+			}
+			
 			//================= HTML OUTPUT =====================//
 			
 			// Errors?

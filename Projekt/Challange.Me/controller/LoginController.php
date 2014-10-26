@@ -44,7 +44,7 @@ class LoginController{
 		if(count($user) == 1){
 			// Save user
 			$this->loggedInUser = new \model\User($user[0]['ID'],$user[0]['Username'],$user[0]['APassword'],$user[0]['Email'],
-												  $user[0]['FName'],$user[0]['challengePoints'],$user[0]['LName'] ,$user[0]['IsAdmin'],$user[0]['Banned']);
+												  $user[0]['FName'],$user[0]['LName'],$user[0]['challengePoints'] ,$user[0]['IsAdmin'],$user[0]['Banned']);
 			
 			return true;
 		}

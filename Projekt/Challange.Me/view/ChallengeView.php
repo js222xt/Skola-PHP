@@ -40,6 +40,7 @@ class ChallengeView{
 		}
 					
 		// If admin
+
 		if((boolean)$isAdmin){
 			$html .= "<a class='destroyChallenge' href='index.php?" . $this->destroyChallengeString . "=" . $challenge->GetID(). "&" .
 		 	$this->destroyChallengeString . "=" . $challenge->GetID(). "'>Destroy Challenge!</a>";
